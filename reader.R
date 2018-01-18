@@ -46,9 +46,10 @@ NameFormatter<-function(Transcripts,phenodata)
     return(NamesOriginal)
 }
 
-SearchByTissue<-function(Tissue)
+SearchByTissue<-function(Tissue,Name)
     ##subsets the dataframe to extract only columns reguarding a certain tissue
 {
+    
     ##create FPKM.tissue and OUT.tissue strings
     paste("Plotting FKPM for tissue ",Tissue)
     Fpkm="FPKM"
@@ -67,27 +68,44 @@ SearchByTissue<-function(Tissue)
     TransCov<-transcripts[ ,eval(temp)]
 
     ##create a dataframe that has the id's of the genes and the fpkm data
-    final<-merge(transcripts$gene_id,TransFpkm,by=0,all=TRUE)
+    final<-merge(transcripts$gene_name,TransFpkm,by=0,all=TRUE)
 
     ##add the coverage values in a column
     final$Coverage=TransCov
 
     ##rename the columns
-    colnames(final)<-c("ID","Gene_id","Fpkm","Coverage")	
+    colnames(final)<-c("ID","Gene_name","Fpkm","Coverage")
+    
+    ## if (name!="NO")
+    ## {
+    ##     if(name %in% final$gene_name)
+    ##     {
+    ##         attach(transcripts)
+    ##         results <- transcripts[which(gene_name==name),]
+    ##         detach(transcripts)
+    ##         return(results)
+    ##     }
+    ##     else
+    ##     {
+    ##         print("Not Found")
+    ##         result=NaN
+    ##     }   
+    ## }
+        
     
     return(final)
 }
 
-SearchByGene<-function(name,transcripts)
+SearchByGene<-function(Name,Transcripts)
     ##subsets the dataframe to extract only lines with a certain gene_name (gene symbol)
 {       
     ##if the gene is oresente in the column gene_name
     ##extract the line with the gene and return it
-    if(name %in% transcripts$gene_name)
+    if(Name %in% Transcripts$gene_name)
     {
-        attach(transcripts)
-        results <- transcripts[which(gene_name==name),]
-        detach(transcripts)
+        attach(Transcripts)
+        results <- Transcripts[which(gene_name==Name),]
+        detach(Transcripts)
         return(results)
     }
     else
@@ -98,20 +116,19 @@ SearchByGene<-function(name,transcripts)
     return(result)
 }
 
-SearchByFeature<-function(name,data.fil,feature)
+SearchByFeature<-function(Name,Feature,data.fil,Phenodata)
     ##subsets the dataframe to extract only lines with a certain gene_name and a certain gene feature (exon or intron)
     ##data.fil must be input (presents informations about the intron, exon and so on.
 {
     ##the code from search by gene name is repetead 2 times and merged
     db<-data.fil@expr
     results=NULL
-    if(name %in% db$trans$gene_name)
+    if(Name %in% db$trans$gene_name)
     {
-        ##transcripts <-data.fil@expr$trans
+
         transcripts <-db$trans
-        ##print(typeof(transcripts))
         attach(transcripts)
-        results <- transcripts[which(gene_name==name),]
+        results <- transcripts[which(gene_name==Name),]
         detach(transcripts)
 
         ## I extract the chromosome where is located the gene
@@ -126,7 +143,7 @@ SearchByFeature<-function(name,data.fil,feature)
         result=NaN
     }
 
-    if(feature=="exon")
+    if(Feature=="exon")
     {
         final<-db$exon[which(db$exon$chr==chr_position & db$exon$start >= gene_begin & db$exon$end <= gene_end),]
     }
@@ -134,6 +151,34 @@ SearchByFeature<-function(name,data.fil,feature)
     {
         final<-db$intron[which(db$intron$chr==chr_position & db$intron$start >= gene_begin & db$intron$end <= gene_end),]
     }
+
+    ## Change name of the columns
+    ## Other columns to be maintained?
+    
+    exclude<-grep("mrcount",colnames(final))
+    final<-final[,-exclude]
+    exclude<-grep("ucount",colnames(final))
+    final<-final[,-exclude]
+
+    print(head(final))
+
+    NamesOriginal<-colnames(final)
+    
+    Tissue_Names <- phenodata[,2]
+    for (i in c(0:nrow(phenodata)))
+    {
+        Folders=phenodata[i,1]
+        rcount="rcount"
+        Tissue_RC=paste(rcount,Folders,"sep"=".")
+        if(Tissue_RC%in%colnames(final))
+        {
+            pos<-match(Tissue_RC,NamesOriginal)
+            tissue <- phenodata[i,2]
+            str_tissue <- paste("Read Count",toString(tissue),sep=" ")
+            NamesOriginal[pos] <- str_tissue
+        }
+    }
+    colnames(final)<-NamesOriginal
     return(final)
 }
 
@@ -391,7 +436,7 @@ if (args[1]==1 && length(args)<2)
     print("Search by gene feature")
     ##args[2]=gene name
     ##args[3]=feature name
-    Feature_Done<-SearchByFeature(args[2],data.fil,args[3])
+    Feature_Done<-SearchByFeature(args[2],args[3],data.fil,phenodata)
     out_file=paste("SearchFeature",File_Hash,sep="_")
     write.table(Feature_Done, out_file,row.names=FALSE,col.names=TRUE)
 }else if (args[1]==5 && length(args)<3)
@@ -423,3 +468,5 @@ if (args[1]==1 && length(args)<2)
 ##7)ok  add the writing step to all functions
 ##8) better way to switch between functions
 ##9) search by gene: ID column?
+##10) Search_by_Feature: maintain gene/feature position?
+##11) fix colnames in Search_by_Feature output
