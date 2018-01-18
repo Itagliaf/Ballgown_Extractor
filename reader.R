@@ -469,4 +469,8 @@ if (args[1]==1 && length(args)<2)
 ##8) better way to switch between functions
 ##9) search by gene: ID column?
 ##10) Search_by_Feature: maintain gene/feature position?
-##11) fix colnames in Search_by_Feature output
+##11)ok  fix colnames in Search_by_Feature output
+##12)  manage exception when no data.fil.Rdata is found
+##13)  manage exception when no transcripts is found
+##14)  split the file in a source file and a execution file
+##15)  Erase Rplots.pdf from plotter
