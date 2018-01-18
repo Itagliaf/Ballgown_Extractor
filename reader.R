@@ -302,8 +302,7 @@ Plotter<-function(Genes,Transcripts)
         dev.off()
     }
 
-
-    return(p)	
+    #return(p)	
 }
 
 ##---- Importing files ----
@@ -456,21 +455,3 @@ if (args[1]==1 && length(args)<2)
     out_file=paste("SearchFold",File_Hash,sep="_")
     write.table(Fold_Done, out_file,row.names=FALSE,col.names=TRUE)
 }
-
-
-##----FIXES NEEDED----
-##1)ok  format the name in data.fil object
-##2)ok  save data.fil with another name (now is db)
-##3)ok  fix search by gene_feature consequently
-##4)ok  sum a little value to the FPKM to avoid Inf values
-##5)ok  search by feature: add beg and end of gene
-##6) add a gene in search by tissue and search by differential fold
-##7)ok  add the writing step to all functions
-##8) better way to switch between functions
-##9) search by gene: ID column?
-##10) Search_by_Feature: maintain gene/feature position?
-##11)ok  fix colnames in Search_by_Feature output
-##12)  manage exception when no data.fil.Rdata is found
-##13)  manage exception when no transcripts is found
-##14)  split the file in a source file and a execution file
-##15)  Erase Rplots.pdf from plotter
