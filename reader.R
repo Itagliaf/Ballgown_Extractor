@@ -1,0 +1,425 @@
+##---- Preamble: Importing Libraries----
+library(ggplot2)
+##----function definitions----
+
+NameFormatter<-function(Transcripts,phenodata)
+    ##formats in a better way the names of the columns
+
+{
+    ##takes the names from the transcripts dataframe
+    NamesOriginal<-colnames(Transcripts)
+
+    ##takes the names of the tissue from phenodata
+    Tissue_Names<-phenodata[,2]
+    
+    ##for each row in the phenotipic data
+    for (i in c(0:nrow(phenodata)))
+    {
+        ##take the name of the ith sample and add ".cov" or ".FPMK"
+        Folders=phenodata[i,1]  
+        Fpkm="FPKM"
+        Cov="cov"
+        TissueCol=paste(Fpkm,Folders,"sep"=".")
+        TissueCov=paste(Cov,Folders,"sep"=".")
+
+        ##If TissueCol is found in the names of the transcripts, sobstitute the name
+        if(TissueCol%in%colnames(transcripts))
+        {
+            pos<-match(TissueCol,NamesOriginal)
+            tissue<-phenodata[i,2]
+            str_tissue<-paste(Fpkm,toString(tissue),sep=".")
+            NamesOriginal[pos]<-str_tissue
+        }
+
+        ##If TissueCov is found in the names of the transcripts, sobstitute the name	
+        if(TissueCov%in%colnames(transcripts))
+        {
+            pos<-match(TissueCov,NamesOriginal)
+            tissue<-phenodata[i,2]
+            str_tissue<-paste(Cov,toString(tissue),sep=".")
+            NamesOriginal[pos]<-str_tissue
+        }
+        
+
+    }
+    ##returns a vector with the names of the tissues
+    return(NamesOriginal)
+}
+
+SearchByTissue<-function(Tissue)
+    ##subsets the dataframe to extract only columns reguarding a certain tissue
+{
+    ##create FPKM.tissue and OUT.tissue strings
+    paste("Plotting FKPM for tissue ",Tissue)
+    Fpkm="FPKM"
+    Out="OUT"
+    TissueCol=paste(Fpkm,Tissue,"sep"=".")
+    ##valutate the value of TissueCol and search it in transcripts
+    temp<-quote(TissueCol)
+
+    ##subset transcript with only the fpkm column
+    TransFpkm<-transcripts[ ,eval(temp)]
+    
+    ##Add coverage column in the same way as before
+    Cov="cov"
+    TissueCol=paste(Cov,Tissue,"sep"=".")
+    temp<-quote(TissueCol)
+    TransCov<-transcripts[ ,eval(temp)]
+
+    ##create a dataframe that has the id's of the genes and the fpkm data
+    final<-merge(transcripts$gene_id,TransFpkm,by=0,all=TRUE)
+
+    ##add the coverage values in a column
+    final$Coverage=TransCov
+
+    ##rename the columns
+    colnames(final)<-c("ID","Gene_id","Fpkm","Coverage")	
+    
+    return(final)
+}
+
+SearchByGene<-function(name,transcripts)
+    ##subsets the dataframe to extract only lines with a certain gene_name (gene symbol)
+{       
+    ##if the gene is oresente in the column gene_name
+    ##extract the line with the gene and return it
+    if(name %in% transcripts$gene_name)
+    {
+        attach(transcripts)
+        results <- transcripts[which(gene_name==name),]
+        detach(transcripts)
+        return(results)
+    }
+    else
+    {
+        print("Not Found")
+        result=NaN
+    }
+    return(result)
+}
+
+SearchByFeature<-function(name,data.fil,feature)
+    ##subsets the dataframe to extract only lines with a certain gene_name and a certain gene feature (exon or intron)
+    ##data.fil must be input (presents informations about the intron, exon and so on.
+{
+    ##the code from search by gene name is repetead 2 times and merged
+    db<-data.fil@expr
+    results=NULL
+    if(name %in% db$trans$gene_name)
+    {
+        ##transcripts <-data.fil@expr$trans
+        transcripts <-db$trans
+        ##print(typeof(transcripts))
+        attach(transcripts)
+        results <- transcripts[which(gene_name==name),]
+        detach(transcripts)
+
+        ## I extract the chromosome where is located the gene
+        ##and the start-end position of the gene considered 
+        chr_position<-results$chr
+        gene_begin<-min(results$start)
+        gene_end<-max(results$end)
+    }
+    else
+    {
+        print("Not Found")
+        result=NaN
+    }
+
+    if(feature=="exon")
+    {
+        final<-db$exon[which(db$exon$chr==chr_position & db$exon$start >= gene_begin & db$exon$end <= gene_end),]
+    }
+    else
+    {
+        final<-db$intron[which(db$intron$chr==chr_position & db$intron$start >= gene_begin & db$intron$end <= gene_end),]
+    }
+    return(final)
+}
+
+SearchByDiffFoldExpr<-function(Tissue1,Tissue2,Transcripts)
+    ##subsets the dataframe to extract only 2 tissues and confront their expression (fold expression)
+{       
+    ##Extract FPKM values from the tissues 
+    Fpkm="FPKM"
+    Out="OUT"
+    TissueCol1=paste(Fpkm,Tissue1,"sep"=".")
+    TissueCol2=paste(Fpkm,Tissue2,"sep"=".")
+
+    temp1<-quote(TissueCol1)
+    temp2<-quote(TissueCol2)
+    
+    TransFpkm1<-Transcripts[,eval(temp1)]
+    TransFpkm2<-Transcripts[,eval(temp2)]
+
+    ##Add covariance column
+
+    Cov="cov"
+    TissueCol1=paste(Cov,Tissue1,sep=".")
+    TissueCol2=paste(Cov,Tissue2,sep=".")
+
+    temp1<-quote(TissueCol1)
+    temp2<-quote(TissueCol2)
+    
+    TransCov1<-Transcripts[,eval(temp1)]
+    TransCov2<-Transcripts[,eval(temp2)]
+
+    ##Creating a data table containing only the columns needed
+    LittleData<-merge(Transcripts$gene_id,TransFpkm1,by=0,all=TRUE)
+    LittleData$Transcript2=TransFpkm2
+
+    colnames(LittleData)<-c("ID","Gene ID",Tissue1,Tissue2)
+
+
+    ##add a little value to avoid 0 on denominators
+    LittleData[,3]<-LittleData[c(0:nrow(LittleData)),3]+0.000001
+    LittleData[,4]<-LittleData[c(0:nrow(LittleData)),4]+0.000001
+
+    ##Calculate fold changes (both normal and logarithmyc values)
+    LittleData$"FoldChanges"
+    LittleData$"Log2FoldChanges"
+    for(line in c(0:nrow(LittleData)))
+    {
+        FC=(LittleData[line,Tissue1]/LittleData[line,Tissue2])
+        LittleData[line,"FoldChanges"]=FC       
+        
+        Log2FC=log2(FC)
+        LittleData[line,"Log2FoldChanges"]=Log2FC       
+    }
+
+    return(LittleData)
+}
+
+Plotter<-function(Genes,Transcripts)
+    ##from a vector of genes creates a table and a histogram
+{
+    Transcripts_FPKM<-Transcripts[,grep("FPKM",colnames(Transcripts))]
+    Transcripts_FPKM$gene_name<-Transcripts$gene_name
+    subsetted=NULL
+    
+    for (gene in Genes)
+    {
+        temp<-subset(Transcripts_FPKM,Transcripts_FPKM$gene_name==gene)
+        subsetted<-rbind(subsetted,temp)	
+    }
+
+    subsetted_ok=NULL
+    for (gene in Genes)
+    {
+        if (length(grep(gene,subsetted$gene_name)>1))
+        {
+            multiple<-subsetted[grep(gene,subsetted$gene_name,),]
+            mean_vec<-apply(multiple[,-ncol(multiple)],2,mean)
+            ##mean_vec$gene_nane
+            ##mean_vec
+            subsetted_ok<-rbind(subsetted_ok,mean_vec)
+        }
+        else
+        {
+            subsetted_ok<-rbind(subsetted_ok,subsetted[grep(gene,subsetted$gene_name,),-ncol(subsetted)])
+        }
+    }
+    subsetted<-subsetted_ok
+    ##subsetted$gene_name<-Genes
+    row.names(subsetted)<-Genes
+    colnames(subsetted)<-gsub("FPKM.","",colnames(subsetted))
+    colnames(subsetted)<-gsub("\\."," ",colnames(subsetted))
+
+    subsetted<-subsetted[,-ncol(subsetted)]
+    subsetted<-as.data.frame(subsetted)
+
+    tsubsetted<-t(subsetted)
+
+    ##row.names(tsubsetted)<-colnames(subsetted)
+
+    tsubsetted<-as.data.frame(tsubsetted)
+    tsubsetted$tissue<-row.names(tsubsetted)
+    
+    for (gene in Genes)
+    {
+        out_file <- paste(gene,"png",sep=".")
+        ylab_ok <- paste(gene,"(FPKM)",sep=" ")
+        df2 <- tsubsetted[,c(gene, "tissue")]
+        print(gene)
+        p<-ggplot(data=df2)+
+            geom_bar(stat="identity",aes_string(x="tissue",y=gene,fill="tissue"))+
+            theme_minimal()+
+            labs(x="TISSUE",y=ylab_ok)+
+            theme(axis.text.x=element_text(angle=75,vjust=0.5,size=10))+
+            theme(axis.title.x=element_text(size=15))+
+            theme(axis.text.y=element_text(size=15))+
+            theme(axis.title.y=element_text(size=15))+
+            theme(legend.position="none")
+        
+        png(filename=out_file,width = 1200, height = 800)
+        
+        print(p)
+        dev.off()
+    }
+
+
+    return(p)	
+}
+
+##---- Importing files ----
+#importing data and savng them into data.fil.RData
+args <- commandArgs(TRUE)
+
+#Sanity check: there are arguments?
+if (length(args)==0)
+{
+    print ("Choose a function as follow:")
+    print ("1 = Plotter Function")
+    print ("2 = Search by Tissue")
+    print ("3 = Search by gene")
+    print ("4 = Search by gene feature")
+    print ("5 = Search by Differential Fold")
+    print ("99 = import data from a ballgonw object")
+    stop("No arguments given")
+}
+
+if (args[1]==99 && length(args)<4)
+{
+    print("Importing data")
+    print("* WARNING: insufficient arguments")
+    print("Argmiument 2: Mapping file (phenodata file)")
+    print("Argument 3: Folder containing the data")
+    print("Argument 4: Common part of sample folders' name")
+    stop("Insufficient Arguments")
+}else if (args[1]==99 && length(args)==4)
+{
+
+    print("Importing data")
+
+    library(ballgown)
+    library(dplyr)
+    library(genefilter)
+
+    ##args[2] Mapping file
+    ##args[3] Folder with data
+    ##args[4] Common Part
+
+    ##phenodata: reports name of folders where input are stored and the tissue they refer to.
+    phenodata<-read.csv(args[2],"header"=TRUE)
+
+    #ballgown class: imports data from the data from outside folders
+    data <- ballgown( dataDir = args[3],
+                 samplePattern = args[4],
+                 bamfiles = NULL,
+                 pData = phenodata,
+                 verbose = TRUE,
+                 meas = "all")
+    #Issue: pdata in ballgow costructor doesn't work,
+    #Proceding in making it "manually"
+    pData(data)=phenodata
+
+    #---- Data preparing ----
+    #Getting only the genes with a significat variance between expressions in tissues
+    data.fil = subset(data,"rowVars(texpr(data))>1",genomesubset=TRUE)
+
+    save(data.fil,file="data.fil.RData")
+
+    print("Your data are stored in data.fil.RData")
+    stop("All done: exiting")
+}
+
+##laoding data.fil
+load("data.fil.RData")
+
+##Extracting only the transcripts: we have fpkm normalized of each gene inside samples
+transcripts <-data.fil@expr$trans
+
+##phenodata (for names)
+phenodata<-read.csv("phenodata.csv","header"=TRUE)
+
+##NameFormatter(transcripts,phenodata)
+colnames(transcripts)<-NameFormatter(transcripts,phenodata)
+
+
+##Function run: for each function there's a sanity check
+
+File_Hash<-paste(format(Sys.time(), "%Y_%m_%d_%H_%M_%S"),"tsv",sep=".")
+
+##==> PLOTTER <==
+if (args[1]==1 && length(args)<2)
+{
+    print("Plotter: plots FPKM vaules of one or more genes in all tissue considered")
+    print("Argument 2: File containig the genes names to be analyzed (sep=\n)")
+    print("Exiting")
+    stop("Insufficient Arguments")
+}else if (args[1]==1 && length(args)>=2)
+{
+    print("Plotter")
+    Genes<-scan(args[2],what="character")
+    Plotter(Genes,transcripts)
+}else if (args[1]==2 && length(args)<2)
+{
+    ##==> SEARCH BY TISSUE <==
+    print("Search by Tissue")
+    print("Argument 2: tissue name to be analyzed")
+    print("Exiting")
+    stop("Insufficient Arguments")
+}else if (args[1]==2 && length(args)>=2)
+{
+    print("Search by Tissue")
+    Tissue_Done<-SearchByTissue(args[2])
+    out_file=paste("SearchTissue",File_Hash,sep="_")
+    write.table(Tissue_Done, out_file,row.names=FALSE,col.names=TRUE)
+}else if (args[1]==3 && length(args)<2)
+{
+    ##==> SEARCH BY GENE <==
+    print("Search by Gene")
+    print("Argument 2: gene name to be analyzed")
+    print("Exiting")
+    stop("Insufficient Arguments")
+}else if (args[1]==3 && length(args)>=2)
+{
+    print("Search by gene")
+    Gene_Done<-SearchByGene(args[2],transcripts)
+    out_file=paste("SearchGene",File_Hash,sep="_")
+    write.table(Gene_Done, out_file,row.names=FALSE,col.names=TRUE)
+}else if (args[1]==4 && length(args)<3)
+{
+    ##==> SEARCH BY GENE FEATURE <==
+    print("Search by gene feature")
+    print("Argument 2: gene name to be analyzed")
+    print("Argument 3: gene feature to be analyzed")
+    print("Exiting")
+    stop("Insufficient Arguments")
+}else if (args[1]==4 && length(args)>=3)
+{
+    print("Search by gene feature")
+    ##args[2]=gene name
+    ##args[3]=feature name
+    Feature_Done<-SearchByFeature(args[2],data.fil,args[3])
+    out_file=paste("SearchFeature",File_Hash,sep="_")
+    write.table(Feature_Done, out_file,row.names=FALSE,col.names=TRUE)
+}else if (args[1]==5 && length(args)<3)
+{
+    ##==> SEARCH BY DIFFERENTIAL FOLD <==
+    print("Search by Differential fold")
+    print("Argument 2: first tissue to be analyzed")
+    print("Argument 3: second tissue to be analyzed")
+    print("Exiting")
+    stop("Insufficient Arguments")
+}else if (args[1]==5 && length(args)>=3)
+{
+    print("Search By Differential Fold")
+    ##args[2]=tissue1
+    ##args[3]=tissue2
+    Fold_Done <- SearchByDiffFoldExpr(args[2],args[3],transcripts)
+    out_file=paste("SearchFold",File_Hash,sep="_")
+    write.table(Fold_Done, out_file,row.names=FALSE,col.names=TRUE)
+}
+
+
+##----FIXES NEEDED----
+##1)ok  format the name in data.fil object
+##2)ok  save data.fil with another name (now is db)
+##3)ok  fix search by gene_feature consequently
+##4)ok  sum a little value to the FPKM to avoid Inf values
+##5)ok  search by feature: add beg and end of gene
+##6) add a gene in search by tissue and search by differential fold
+##7)ok  add the writing step to all functions
+##8) better way to switch between functions
+##9) search by gene: ID column?
