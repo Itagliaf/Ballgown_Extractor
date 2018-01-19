@@ -4,11 +4,11 @@ Ballgown extractor is a R script able to manage transcriptome data obtained by a
 
 In particular, these scripts will allow you to extract information about single genes, tissues and gene features.
 
-#Dependencies
+# Dependencies
 
 The following packages are needed:
 
-- [ballgown] (http://bioconductor.org/packages/release/bioc/html/ballgown.html)
+- [ballgown](http://bioconductor.org/packages/release/bioc/html/ballgown.html)
 - [dplyr](https://cran.r-project.org/web/packages/dplyr/README.html)
-- [genefilter] (http://bioconductor.org/packages/release/bioc/html/genefilter.html)
+- [genefilter](http://bioconductor.org/packages/release/bioc/html/genefilter.html)
 - [ggplot2](http://ggplot2.org/)
