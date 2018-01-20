@@ -1,3 +1,5 @@
+[![License: GPL v3](https://img.shields.io/badge/License-GPL%20v3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
+
 # Ballgown Extractor
 
 Ballgown extractor is a R script able to manage transcriptome data obtained by a [pipeline](https://www.ncbi.nlm.nih.gov/pubmed/27560171) described by Petrea and collegues. This pipeline take advantage of [Hisat](https://ccb.jhu.edu/software/hisat2/index.shtml), [Stringtie](https://ccb.jhu.edu/software/stringtie/) and the R package [Ballgown](http://bioconductor.org/packages/release/bioc/html/ballgown.html).
