@@ -383,7 +383,20 @@ if (args[1]==99 && length(args)<4)
 }
 
 ##laoding data.fil
-load("data.fil.RData")
+tryCatch(
+{
+    load("data.fil.RData")
+},
+warning=function(w)
+{
+    print("ERROR: No data.fil.RData available: run the script with the firs argument=99")
+},
+warning=function(e)
+{
+
+    stop("Cannot find data.fil")
+}
+)
 
 ##Extracting only the transcripts: we have fpkm normalized of each gene inside samples
 transcripts <-data.fil@expr$trans
