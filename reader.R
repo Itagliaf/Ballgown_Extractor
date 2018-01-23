@@ -412,3 +412,83 @@ colnames(transcripts)<-NameFormatter(transcripts,phenodata)
 
 File_Hash<-paste(format(Sys.time(), "%Y_%m_%d_%H_%M_%S"),"tsv",sep=".")
 
+switch(args[1],
+       "1"=if(length(args)<2)
+           {
+              print("Plotter: plots FPKM vaules of one or more genes in all tissue considered")
+              print("Argument 2: File containig the genes names to be analyzed (sep=\n)")
+              print("Exiting")
+              stop("Insufficient Arguments")
+           }
+           else
+           {
+               print("Plotter: plots FPKM vaules of one or more genes in all tissue considered")
+               Genes<-scan(args[2],what="character")
+               Plotter(Genes,transcripts)
+           },
+       "2"=if(length(args)<2)
+           {
+               print("Search by Tissue")
+               print("Argument 2: tissue name to be analyzed")
+               print("Argument 3 (otpional): a particular gene to analyzed")
+               print("Exiting")
+               stop("Insufficient Arguments")
+           }
+           else
+           {
+               print("Search by Tissue")
+               Tissue_Done<-SearchByTissue(args[2],args[3])
+               out_file=paste("SearchTissue",File_Hash,sep="_")
+               write.table(Tissue_Done, out_file,row.names=FALSE,col.names=TRUE)
+           },
+       "3"=if(length(args)<2)
+           {
+               print("Search by Gene")
+               print("Argument 2: gene name to be analyzed")
+               print("Exiting")
+               stop("Insufficient Arguments")
+           }
+           else
+           {
+               print("Search by Gene")
+               Gene_Done<-SearchByGene(args[2],transcripts)
+               out_file=paste("SearchGene",File_Hash,sep="_")
+               write.table(Gene_Done, out_file,row.names=FALSE,col.names=TRUE)
+           },
+       "4"=if(length(args)<3)
+           {
+               print("Search by gene feature")
+               print("Argument 2: gene name to be analyzed")
+               print("Argument 3: gene feature to be analyzed")
+               print("Exiting")
+               stop("Insufficient Arguments")
+           }else
+           {
+               print("Search by gene feature")
+               ##args[2]=gene name
+               ##args[3]=feature name
+               Feature_Done<-SearchByFeature(args[2],args[3],data.fil,phenodata)
+               out_file=paste("SearchFeature",File_Hash,sep="_")
+               write.table(Feature_Done, out_file,row.names=FALSE,col.names=TRUE)
+           },
+       "5"=if(length(args)<3)
+           {
+               print("Search by Differenctila fold")
+               print("Argument 2: first tissue to be analyzed")
+               print("Argument 3: second tissue to be analyzed")
+               print("Argument 4 (optional): a particular gene to be analyzed (name)")
+               print("Exiting")
+               stop("Insufficient Arguments")
+           }else
+           {
+               print("Search By Differential Fold")
+               ##args[2]=tissue1
+               ##args[3]=tissue2
+               ##args[4]=gene name (optional) to subset
+               Fold_Done <- SearchByDiffFoldExpr(args[2],args[3],args[4],transcripts)
+               out_file=paste("SearchFold",File_Hash,sep="_")
+               write.table(Fold_Done, out_file,row.names=FALSE,col.names=TRUE)
+           },
+       PrintHelp()
+       
+)
