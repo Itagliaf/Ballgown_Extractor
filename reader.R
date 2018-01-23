@@ -1,4 +1,3 @@
-##new line 
 ##---- Preamble: Importing Libraries----
 library(ggplot2)
 ##----function definitions----
