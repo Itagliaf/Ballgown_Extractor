@@ -2,8 +2,6 @@
 library(ggplot2)
 ##----function definitions----
 
-##testtesttest Ilario
-
 NameFormatter<-function(Transcripts,phenodata)
     ##formats in a better way the names of the columns
 
@@ -416,14 +414,13 @@ if (args[1]==1 && length(args)<2)
     ##==> SEARCH BY TISSUE <==
     print("Search by Tissue")
     print("Argument 2: tissue name to be analyzed")
-    print("Argument 3 (otpional): a particular gene to analyzed")
     print("Exiting")
     stop("Insufficient Arguments")
 }else if (args[1]==2 && length(args)>=2)
 {
     print("Search by Tissue")
-    Tissue_Done<-SearchByTissue(args[2],args[3])
-    out_file=paste("SearchTissue",File_Hash,sep="_")
+    Tissue_Done<-SearchByTissue(args[2])
+    out_file=paste("SearchTissue",args[2],File_Hash,sep="_")
     write.table(Tissue_Done, out_file,row.names=FALSE,col.names=TRUE)
 }else if (args[1]==3 && length(args)<2)
 {
@@ -436,7 +433,7 @@ if (args[1]==1 && length(args)<2)
 {
     print("Search by gene")
     Gene_Done<-SearchByGene(args[2],transcripts)
-    out_file=paste("SearchGene",File_Hash,sep="_")
+    out_file=paste("SearchGene", args[2], File_Hash,sep="_")
     write.table(Gene_Done, out_file,row.names=FALSE,col.names=TRUE)
 }else if (args[1]==4 && length(args)<3)
 {
@@ -451,8 +448,8 @@ if (args[1]==1 && length(args)<2)
     print("Search by gene feature")
     ##args[2]=gene name
     ##args[3]=feature name
-    Feature_Done<-SearchByFeature(args[2],args[3],data.fil,phenodata)
-    out_file=paste("SearchFeature",File_Hash,sep="_")
+    Feature_Done<-SearchByFeature(args[2],data.fil,args[3])
+    out_file=paste("SearchFeature",args[3],"on",args[2],File_Hash,sep="_")
     write.table(Feature_Done, out_file,row.names=FALSE,col.names=TRUE)
 }else if (args[1]==5 && length(args)<3)
 {
@@ -460,7 +457,6 @@ if (args[1]==1 && length(args)<2)
     print("Search by Differential fold")
     print("Argument 2: first tissue to be analyzed")
     print("Argument 3: second tissue to be analyzed")
-    print("Argument 4 (optional): a particular gene to be analyzed (name)")
     print("Exiting")
     stop("Insufficient Arguments")
 }else if (args[1]==5 && length(args)>=3)
@@ -468,8 +464,8 @@ if (args[1]==1 && length(args)<2)
     print("Search By Differential Fold")
     ##args[2]=tissue1
     ##args[3]=tissue2
-    ##args[4]=gene name (optional) to subset
-    Fold_Done <- SearchByDiffFoldExpr(args[2],args[3],args[4],transcripts)
-    out_file=paste("SearchFold",File_Hash,sep="_")
+    Fold_Done <- SearchByDiffFoldExpr(args[2],args[3],transcripts)
+    out_file=paste("SearchFoldChange",args[2],args[3],File_Hash,sep="_")
     write.table(Fold_Done, out_file,row.names=FALSE,col.names=TRUE)
 }
+
