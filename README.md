@@ -25,7 +25,3 @@ The following packages are needed:
 - [dplyr](https://cran.r-project.org/web/packages/dplyr/README.html)
 - [genefilter](http://bioconductor.org/packages/release/bioc/html/genefilter.html)
 - [ggplot2](http://ggplot2.org/)
-<<<<<<< HEAD
-
-=======
->>>>>>> 01eb714cfa4dc56f30cfc28b816daf6e87d8f204
