@@ -76,21 +76,20 @@ SearchByTissue<-function(Tissue,Name)
     ##rename the columns
     colnames(final)<-c("ID","Gene_name","Fpkm","Coverage")
     
-    ## if (name!="NO")
-    ## {
-    ##     if(name %in% final$gene_name)
-    ##     {
-    ##         attach(transcripts)
-    ##         results <- transcripts[which(gene_name==name),]
-    ##         detach(transcripts)
-    ##         return(results)
-    ##     }
-    ##     else
-    ##     {
-    ##         print("Not Found")
-    ##         result=NaN
-    ##     }   
-    ## }
+    if (!is.null(Name) & !is.na(Name))
+    {
+        if(Name %in% final$Gene_name)
+        {
+            attach(final)
+            results <- final[which(Gene_name==Name),]
+            detach(final)
+            final<-results
+        }
+        else
+        {
+            stop(sprintf("Can't find gene: %s",Name))
+        }  
+    }
         
     
     return(final)
@@ -405,8 +404,17 @@ if (args[1]==1 && length(args)<2)
     stop("Insufficient Arguments")
 }else if (args[1]==2 && length(args)>=2)
 {
-    print("Search by Tissue")
-    Tissue_Done<-SearchByTissue(args[2])
+    ## print("Search by Tissue")
+    ## if (is.null(args[3]))
+    ## {
+    ##     Tissue_Done<-SearchByTissue(args[2])
+    ## }
+    ## else
+    ## {   
+    ##     Tissue_Done<-SearchByTissue(args[2],args[3])
+    ## }
+
+    Tissue_Done<-SearchByTissue(args[2],args[3])
     out_file=paste("SearchTissue",File_Hash,sep="_")
     write.table(Tissue_Done, out_file,row.names=FALSE,col.names=TRUE)
 }else if (args[1]==3 && length(args)<2)
