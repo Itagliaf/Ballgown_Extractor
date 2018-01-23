@@ -81,9 +81,8 @@ SearchByTissue<-function(Tissue,Name)
         if(Name %in% final$Gene_name)
         {
             attach(final)
-            results <- final[which(Gene_name==Name),]
+            final <- final[which(Gene_name==Name),]
             detach(final)
-            final<-results
         }
         else
         {
@@ -105,7 +104,6 @@ SearchByGene<-function(Name,Transcripts)
         attach(Transcripts)
         results <- Transcripts[which(gene_name==Name),]
         detach(Transcripts)
-        return(results)
     }
     else
     {
@@ -181,7 +179,7 @@ SearchByFeature<-function(Name,Feature,data.fil,Phenodata)
     return(final)
 }
 
-SearchByDiffFoldExpr<-function(Tissue1,Tissue2,Transcripts)
+SearchByDiffFoldExpr<-function(Tissue1,Tissue2,Name,Transcripts)
     ##subsets the dataframe to extract only 2 tissues and confront their expression (fold expression)
 {       
     ##Extract FPKM values from the tissues 
@@ -209,11 +207,25 @@ SearchByDiffFoldExpr<-function(Tissue1,Tissue2,Transcripts)
     TransCov2<-Transcripts[,eval(temp2)]
 
     ##Creating a data table containing only the columns needed
-    LittleData<-merge(Transcripts$gene_id,TransFpkm1,by=0,all=TRUE)
+    LittleData<-merge(Transcripts$gene_name,TransFpkm1,by=0,all=TRUE)
     LittleData$Transcript2=TransFpkm2
 
-    colnames(LittleData)<-c("ID","Gene ID",Tissue1,Tissue2)
+    colnames(LittleData)<-c("ID","Gene_name",Tissue1,Tissue2)
 
+    if (!is.null(Name) & !is.na(Name))
+    {
+        if(Name %in% LittleData$Gene_name)
+        {
+            attach(LittleData)
+            LittleData <- LittleData[which(Gene_name==Name),]
+            detach(LittleData)
+            #final<-results
+        }
+        else
+        {
+            stop(sprintf("Can't find gene: %s",Name))
+        }  
+    }
 
     ##add a little value to avoid 0 on denominators
     LittleData[,3]<-LittleData[c(0:nrow(LittleData)),3]+0.000001
@@ -230,7 +242,7 @@ SearchByDiffFoldExpr<-function(Tissue1,Tissue2,Transcripts)
         Log2FC=log2(FC)
         LittleData[line,"Log2FoldChanges"]=Log2FC       
     }
-
+    
     return(LittleData)
 }
 
@@ -306,6 +318,8 @@ Plotter<-function(Genes,Transcripts)
 
 ##---- Importing files ----
 #importing data and savng them into data.fil.RData
+
+#Feeding arguments to thw script
 args <- commandArgs(TRUE)
 
 #Sanity check: there are arguments?
@@ -400,20 +414,12 @@ if (args[1]==1 && length(args)<2)
     ##==> SEARCH BY TISSUE <==
     print("Search by Tissue")
     print("Argument 2: tissue name to be analyzed")
+    print("Argument 3 (otpional): a particular gene to analyzed")
     print("Exiting")
     stop("Insufficient Arguments")
 }else if (args[1]==2 && length(args)>=2)
 {
-    ## print("Search by Tissue")
-    ## if (is.null(args[3]))
-    ## {
-    ##     Tissue_Done<-SearchByTissue(args[2])
-    ## }
-    ## else
-    ## {   
-    ##     Tissue_Done<-SearchByTissue(args[2],args[3])
-    ## }
-
+    print("Search by Tissue")
     Tissue_Done<-SearchByTissue(args[2],args[3])
     out_file=paste("SearchTissue",File_Hash,sep="_")
     write.table(Tissue_Done, out_file,row.names=FALSE,col.names=TRUE)
@@ -452,6 +458,7 @@ if (args[1]==1 && length(args)<2)
     print("Search by Differential fold")
     print("Argument 2: first tissue to be analyzed")
     print("Argument 3: second tissue to be analyzed")
+    print("Argument 4 (optional): a particular gene to be analyzed (name)")
     print("Exiting")
     stop("Insufficient Arguments")
 }else if (args[1]==5 && length(args)>=3)
@@ -459,7 +466,8 @@ if (args[1]==1 && length(args)<2)
     print("Search By Differential Fold")
     ##args[2]=tissue1
     ##args[3]=tissue2
-    Fold_Done <- SearchByDiffFoldExpr(args[2],args[3],transcripts)
+    ##args[4]=gene name (optional) to subset
+    Fold_Done <- SearchByDiffFoldExpr(args[2],args[3],args[4],transcripts)
     out_file=paste("SearchFold",File_Hash,sep="_")
     write.table(Fold_Done, out_file,row.names=FALSE,col.names=TRUE)
 }
