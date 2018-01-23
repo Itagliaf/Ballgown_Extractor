@@ -231,7 +231,7 @@ SearchByDiffFoldExpr<-function(Tissue1,Tissue2,Name,Transcripts)
     LittleData[,3]<-LittleData[c(0:nrow(LittleData)),3]+0.000001
     LittleData[,4]<-LittleData[c(0:nrow(LittleData)),4]+0.000001
 
-    ##Calculate fold changes (both normal and logarithmyc values)
+    ##Calculate fold changes (both normal and logarithmic values)
     LittleData$"FoldChanges"
     LittleData$"Log2FoldChanges"
     for(line in c(0:nrow(LittleData)))
