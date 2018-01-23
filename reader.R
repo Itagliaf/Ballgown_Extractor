@@ -46,6 +46,18 @@ NameFormatter<-function(Transcripts,phenodata)
     return(NamesOriginal)
 }
 
+PrintHelp<-function()
+{
+    print ("Choose a function asfollow:")
+    print ("1 = Plotter Function")
+    print ("2 = Search by Tissue")
+    print ("3 = Search by gene")
+    print ("4 = Search by gene feature")
+    print ("5 = Search by Differential Fold")
+    print ("99 = import data from a ballgonw object")
+    stop("No arguments given")
+}
+
 SearchByTissue<-function(Tissue,Name)
     ##subsets the dataframe to extract only columns reguarding a certain tissue
 {
@@ -102,15 +114,14 @@ SearchByGene<-function(Name,Transcripts)
     if(Name %in% Transcripts$gene_name)
     {
         attach(Transcripts)
-        results <- Transcripts[which(gene_name==Name),]
+        final <- Transcripts[which(gene_name==Name),]
         detach(Transcripts)
     }
     else
     {
-        print("Not Found")
-        result=NaN
+        stop(sprintf("Can't find gene: %s",Name))
     }
-    return(result)
+    return(final)
 }
 
 SearchByFeature<-function(Name,Feature,data.fil,Phenodata)
@@ -231,7 +242,7 @@ SearchByDiffFoldExpr<-function(Tissue1,Tissue2,Name,Transcripts)
     LittleData[,3]<-LittleData[c(0:nrow(LittleData)),3]+0.000001
     LittleData[,4]<-LittleData[c(0:nrow(LittleData)),4]+0.000001
 
-    ##Calculate fold changes (both normal and logarithmic values)
+    ##Calculate fold changes (both normal and logarithmyc values)
     LittleData$"FoldChanges"
     LittleData$"Log2FoldChanges"
     for(line in c(0:nrow(LittleData)))
@@ -317,22 +328,13 @@ Plotter<-function(Genes,Transcripts)
 }
 
 ##---- Importing files ----
-#importing data and savng them into data.fil.RData
-
 #Feeding arguments to thw script
 args <- commandArgs(TRUE)
 
 #Sanity check: there are arguments?
 if (length(args)==0)
 {
-    print ("Choose a function as follow:")
-    print ("1 = Plotter Function")
-    print ("2 = Search by Tissue")
-    print ("3 = Search by gene")
-    print ("4 = Search by gene feature")
-    print ("5 = Search by Differential Fold")
-    print ("99 = import data from a ballgonw object")
-    stop("No arguments given")
+    PrintHelp(0)
 }
 
 if (args[1]==99 && length(args)<4)
@@ -396,76 +398,4 @@ colnames(transcripts)<-NameFormatter(transcripts,phenodata)
 ##Function run: for each function there's a sanity check
 
 File_Hash<-paste(format(Sys.time(), "%Y_%m_%d_%H_%M_%S"),"tsv",sep=".")
-
-##==> PLOTTER <==
-if (args[1]==1 && length(args)<2)
-{
-    print("Plotter: plots FPKM vaules of one or more genes in all tissue considered")
-    print("Argument 2: File containig the genes names to be analyzed (sep=\n)")
-    print("Exiting")
-    stop("Insufficient Arguments")
-}else if (args[1]==1 && length(args)>=2)
-{
-    print("Plotter")
-    Genes<-scan(args[2],what="character")
-    Plotter(Genes,transcripts)
-}else if (args[1]==2 && length(args)<2)
-{
-    ##==> SEARCH BY TISSUE <==
-    print("Search by Tissue")
-    print("Argument 2: tissue name to be analyzed")
-    print("Exiting")
-    stop("Insufficient Arguments")
-}else if (args[1]==2 && length(args)>=2)
-{
-    print("Search by Tissue")
-    Tissue_Done<-SearchByTissue(args[2])
-    out_file=paste("SearchTissue",args[2],File_Hash,sep="_")
-    write.table(Tissue_Done, out_file,row.names=FALSE,col.names=TRUE)
-}else if (args[1]==3 && length(args)<2)
-{
-    ##==> SEARCH BY GENE <==
-    print("Search by Gene")
-    print("Argument 2: gene name to be analyzed")
-    print("Exiting")
-    stop("Insufficient Arguments")
-}else if (args[1]==3 && length(args)>=2)
-{
-    print("Search by gene")
-    Gene_Done<-SearchByGene(args[2],transcripts)
-    out_file=paste("SearchGene", args[2], File_Hash,sep="_")
-    write.table(Gene_Done, out_file,row.names=FALSE,col.names=TRUE)
-}else if (args[1]==4 && length(args)<3)
-{
-    ##==> SEARCH BY GENE FEATURE <==
-    print("Search by gene feature")
-    print("Argument 2: gene name to be analyzed")
-    print("Argument 3: gene feature to be analyzed")
-    print("Exiting")
-    stop("Insufficient Arguments")
-}else if (args[1]==4 && length(args)>=3)
-{
-    print("Search by gene feature")
-    ##args[2]=gene name
-    ##args[3]=feature name
-    Feature_Done<-SearchByFeature(args[2],data.fil,args[3])
-    out_file=paste("SearchFeature",args[3],"on",args[2],File_Hash,sep="_")
-    write.table(Feature_Done, out_file,row.names=FALSE,col.names=TRUE)
-}else if (args[1]==5 && length(args)<3)
-{
-    ##==> SEARCH BY DIFFERENTIAL FOLD <==
-    print("Search by Differential fold")
-    print("Argument 2: first tissue to be analyzed")
-    print("Argument 3: second tissue to be analyzed")
-    print("Exiting")
-    stop("Insufficient Arguments")
-}else if (args[1]==5 && length(args)>=3)
-{
-    print("Search By Differential Fold")
-    ##args[2]=tissue1
-    ##args[3]=tissue2
-    Fold_Done <- SearchByDiffFoldExpr(args[2],args[3],transcripts)
-    out_file=paste("SearchFoldChange",args[2],args[3],File_Hash,sep="_")
-    write.table(Fold_Done, out_file,row.names=FALSE,col.names=TRUE)
-}
 
