@@ -438,7 +438,7 @@ switch(args[1],
            {
                print("Search by Tissue")
                Tissue_Done<-SearchByTissue(args[2],args[3])
-               out_file=paste("SearchTissue",File_Hash,sep="_")
+               out_file=paste("SearchTissue",args[2],File_Hash,sep="_")
                write.table(Tissue_Done, out_file,row.names=FALSE,col.names=TRUE)
            },
        "3"=if(length(args)<2)
@@ -452,7 +452,7 @@ switch(args[1],
            {
                print("Search by Gene")
                Gene_Done<-SearchByGene(args[2],transcripts)
-               out_file=paste("SearchGene",File_Hash,sep="_")
+               out_file=paste("SearchGene",args[2],File_Hash,sep="_")
                write.table(Gene_Done, out_file,row.names=FALSE,col.names=TRUE)
            },
        "4"=if(length(args)<3)
@@ -468,7 +468,7 @@ switch(args[1],
                ##args[2]=gene name
                ##args[3]=feature name
                Feature_Done<-SearchByFeature(args[2],args[3],data.fil,phenodata)
-               out_file=paste("SearchFeature",File_Hash,sep="_")
+               out_file=paste("SearchFeature",args[2],args[3],File_Hash,sep="_")
                write.table(Feature_Done, out_file,row.names=FALSE,col.names=TRUE)
            },
        "5"=if(length(args)<3)
@@ -486,7 +486,7 @@ switch(args[1],
                ##args[3]=tissue2
                ##args[4]=gene name (optional) to subset
                Fold_Done <- SearchByDiffFoldExpr(args[2],args[3],args[4],transcripts)
-               out_file=paste("SearchFold",File_Hash,sep="_")
+               out_file=paste("SearchFold",args[2],args[3],File_Hash,sep="_")
                write.table(Fold_Done, out_file,row.names=FALSE,col.names=TRUE)
            },
        PrintHelp()
