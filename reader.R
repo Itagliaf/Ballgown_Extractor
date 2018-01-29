@@ -15,7 +15,7 @@ args <- commandArgs(TRUE)
 #Sanity check: there are arguments?
 if (length(args)==0)
 {
-    PrintHelp(0)
+    PrintHelp()
 }
 
 if (args[1]==99 && length(args)<4)
