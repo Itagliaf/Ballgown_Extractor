@@ -54,29 +54,31 @@ PrintHelp<-function()
     stop("No arguments given")
 }
 
-SearchByTissue<-function(Tissue,Name)
+SearchByTissue<-function(Tissue,Name,Transcripts)
     ##subsets the dataframe to extract only columns reguarding a certain tissue
 {
-    
+    print("Search By Tissue")
+    print(Tissue)
+    print(Name)
     ##create FPKM.tissue and OUT.tissue strings
     paste("Plotting FKPM for tissue ",Tissue)
     Fpkm="FPKM"
     Out="OUT"
     TissueCol=paste(Fpkm,Tissue,"sep"=".")
-    ##valutate the value of TissueCol and search it in transcripts
+    ##valutate the value of TissueCol and search it in Transcripts
     temp<-quote(TissueCol)
 
     ##subset transcript with only the fpkm column
-    TransFpkm<-transcripts[ ,eval(temp)]
+    TransFpkm<-Transcripts[ ,eval(temp)]
     
     ##Add coverage column in the same way as before
     Cov="cov"
     TissueCol=paste(Cov,Tissue,"sep"=".")
     temp<-quote(TissueCol)
-    TransCov<-transcripts[ ,eval(temp)]
+    TransCov<-Transcripts[ ,eval(temp)]
 
     ##create a dataframe that has the id's of the genes and the fpkm data
-    final<-merge(transcripts$gene_name,TransFpkm,by=0,all=TRUE)
+    final<-merge(Transcripts$gene_name,TransFpkm,by=0,all=TRUE)
 
     ##add the coverage values in a column
     final$Coverage=TransCov
@@ -104,7 +106,10 @@ SearchByTissue<-function(Tissue,Name)
 
 SearchByGene<-function(Name,Transcripts)
     ##subsets the dataframe to extract only lines with a certain gene_name (gene symbol)
-{       
+{
+    print("Search By Gene")
+    print(Name)
+
     ##if the gene is oresente in the column gene_name
     ##extract the line with the gene and return it
     if(Name %in% Transcripts$gene_name)
@@ -124,6 +129,10 @@ SearchByFeature<-function(Name,Feature,data.fil,Phenodata)
     ##subsets the dataframe to extract only lines with a certain gene_name and a certain gene feature (exon or intron)
     ##data.fil must be input (presents informations about the intron, exon and so on.
 {
+    print("Search By Gene Feature")
+    print(Name)
+    print(Feature)
+    
     ##the code from search by gene name is repetead 2 times and merged
     db<-data.fil@expr
     results=NULL
@@ -188,7 +197,12 @@ SearchByFeature<-function(Name,Feature,data.fil,Phenodata)
 
 SearchByDiffFoldExpr<-function(Tissue1,Tissue2,Name,Transcripts)
     ##subsets the dataframe to extract only 2 tissues and confront their expression (fold expression)
-{       
+{
+    print("Search By Differential Exprewssion")
+    print(Tissue1)
+    print(Tissue2)
+    print(Name)
+    
     ##Extract FPKM values from the tissues 
     Fpkm="FPKM"
     Out="OUT"
@@ -265,8 +279,8 @@ Plotter<-function(Genes,Transcripts)
         temp<-subset(Transcripts_FPKM,Transcripts_FPKM$gene_name==gene)
         subsetted<-rbind(subsetted,temp)	
     }
-
     subsetted_ok=NULL
+
     for (gene in Genes)
     {
         if (length(grep(gene,subsetted$gene_name)>1))
@@ -288,9 +302,15 @@ Plotter<-function(Genes,Transcripts)
     colnames(subsetted)<-gsub("FPKM.","",colnames(subsetted))
     colnames(subsetted)<-gsub("\\."," ",colnames(subsetted))
 
-    subsetted<-subsetted[,-ncol(subsetted)]
-    subsetted<-as.data.frame(subsetted)
-
+    if (length(Genes)==1)
+    {
+        print("subsetted is ok")
+    }
+    else
+    {
+        subsetted<-subsetted[,-ncol(subsetted)]
+        subsetted<-as.data.frame(subsetted)
+    }
     tsubsetted<-t(subsetted)
 
     ##row.names(tsubsetted)<-colnames(subsetted)
@@ -302,7 +322,16 @@ Plotter<-function(Genes,Transcripts)
     {
         out_file <- paste(gene,"png",sep=".")
         ylab_ok <- paste(gene,"(FPKM)",sep=" ")
-        df2 <- tsubsetted[,c(gene, "tissue")]
+        
+        #print(tsubsetted)
+        if (length(Genes)==1)
+        {
+            df2<-tsubsetted
+        }
+        else
+        {
+            df2 <- tsubsetted[,c(gene, "tissue")]
+        }
         print(gene)
         p<-ggplot(data=df2)+
             geom_bar(stat="identity",aes_string(x="tissue",y=gene,fill="tissue"))+
@@ -314,9 +343,10 @@ Plotter<-function(Genes,Transcripts)
             theme(axis.title.y=element_text(size=15))+
             theme(legend.position="none")
         
-        png(filename=out_file,width = 1200, height = 800)
+        #png(filename=out_file,width = 1200, height = 800)
         
-        print(p)
-        dev.off()
+        #print(p)
+                                        #dev.off()
+        return(p)
     }
 }
