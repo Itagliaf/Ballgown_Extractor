@@ -126,7 +126,7 @@ switch(args[1],
            else
            {
                print("Search by Tissue")
-               Tissue_Done<-SearchByTissue(args[2],args[3])
+               Tissue_Done<-SearchByTissue(args[2],args[3],transcripts)
                out_file=paste("SearchTissue",args[2],File_Hash,sep="_")
                write.table(Tissue_Done, out_file,row.names=FALSE,col.names=TRUE)
            },
