@@ -1,6 +1,9 @@
 ##---- Preamble: Importing Libraries----
 library(ggplot2)
-#---------------------------------------
+library(Cairo)
+#antialiasing
+options(shiny.usecairo=T)
+##---------------------------------------
 
 ##----- Importing function definitions ----
 source("definitions.R")

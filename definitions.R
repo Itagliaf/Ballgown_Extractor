@@ -170,7 +170,7 @@ SearchByFeature<-function(Name,Feature,data.fil,Phenodata)
     exclude<-grep("ucount",colnames(final))
     final<-final[,-exclude]
 
-    print(head(final))
+    
 
     NamesOriginal<-colnames(final)
     
@@ -319,7 +319,7 @@ Plotter<-function(Genes,Transcripts)
     }
     tsubsetted<-t(subsetted)
 
-    ##row.names(tsubsetted)<-colnames(subsetted)
+    row.names(tsubsetted)<-colnames(subsetted)
 
     tsubsetted<-as.data.frame(tsubsetted)
     tsubsetted$tissue<-row.names(tsubsetted)
@@ -349,10 +349,9 @@ Plotter<-function(Genes,Transcripts)
             theme(axis.title.y=element_text(size=15))+
             theme(legend.position="none")
         
-        ##png(filename=out_file,width = 1200, height = 800)
-        
-        ##print(p)
-        ##dev.off()
-        return(p)
+        ## png(filename=out_file,width = 1200, height = 800)        
+        ## print(p)
+        ## dev.off()
     }
+    return(p)
 }
