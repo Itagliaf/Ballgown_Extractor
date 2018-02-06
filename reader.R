@@ -181,6 +181,11 @@ switch(args[1],
                out_file=paste("SearchFold",args[2],args[3],File_Hash,sep="_")
                write.table(Fold_Done, out_file,row.names=FALSE,col.names=TRUE)
            },
+       "6"={
+           Gene_Module<-SearchTranscriptGroup(args[2],args[3],transcripts)
+           print(Gene_Module)
+           }
+      ,
        PrintHelp()
        
 )

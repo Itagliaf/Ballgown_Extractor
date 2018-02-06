@@ -349,9 +349,25 @@ Plotter<-function(Genes,Transcripts)
             theme(axis.title.y=element_text(size=15))+
             theme(legend.position="none")
         
-        ## png(filename=out_file,width = 1200, height = 800)        
-        ## print(p)
-        ## dev.off()
     }
     return(p)
+}
+
+SearchTranscriptGroup<-function(Name,ModulesFile,Transcripts)
+{
+    ##Name: gene name to be analyzed
+    ##ModulesFile: file containig informations about coexpression
+    ##modules (TOM files from WGCNA pipeline)
+
+    load(ModulesFile)
+
+    pos<-match(Name,colnames(datExpr))
+    geneModule<-moduleLabels[pos]
+
+    ##extracting all genes belongin to the module
+    Gene_Module<-names(datExpr)[moduleLabels==geneModule]
+
+    subsetted<-transcripts[transcripts$gene_id %in% Gene_Module,]
+    
+    return(subsetted[,c(1:10)])
 }
