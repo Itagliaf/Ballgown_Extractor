@@ -366,8 +366,94 @@ SearchTranscriptGroup<-function(Name,ModulesFile,Transcripts)
 
     ##extracting all genes belongin to the module
     Gene_Module<-names(datExpr)[moduleLabels==geneModule]
-
     subsetted<-transcripts[transcripts$gene_id %in% Gene_Module,]
-    
+                                        #    subsetted<-transcripts[transcripts$gene_name %in% Gene_Module,]
+        
     return(subsetted[,c(1:10)])
+}
+
+Network<-function(query,MODULES,DATA.FIL,corr,results)
+{
+    load(MODULES)
+    load(DATA.FIL)
+
+    if(length(corr)==0)
+    {
+        corr=0.9
+    }
+
+    if(length(results)==0)
+    {
+        results=50
+    }
+    match(query,colnames(datExpr))
+
+    query_position<-match(query,colnames(datExpr))
+    query_module<-moduleLabels[query_position]
+    query_module
+
+    module_line<-which(moduleLabels %in% query_module)
+    datExpr_module<-datExpr[,module_line]
+
+    A<-cor(datExpr_module)
+    colnames(A)
+
+    diag(A)<-0
+    A[A<corr]=0
+
+    row_col=match(query,colnames(A))
+    cor_vec=abs(A[,row <- col])
+    C<-names(sort(abs(A[,row_col]),decreasing=TRUE)[c(0:results)])
+
+    D<-A[C,C]
+
+    print(C)
+    print(rownames(A[C,C]))
+
+    ##/20 is a maialata to stress distances between nodes
+    ##D<-(D[Lines_0,Lines_0])/20
+
+
+    C<-rownames(D)
+
+    transcripts<-data.fil@expr$trans
+
+    library(igraph)
+    graph<-graph_from_adjacency_matrix(D,mode="max",weighted=TRUE,diag=FALSE)
+    ##to have a star layout
+    ##to color the vertexes
+
+    V(graph)$gene=as.character(transcripts[match(C,transcripts$t <- name),]$gene <- name)
+    coul=rainbow(n=length(V(graph)$gene))
+    my_color=coul[as.numeric(as.factor(V(graph)$gene))]
+
+    graph<-simplify(graph)
+    ##plotting
+
+    jpeg("Auto.jpeg",width=1080,heigh=720)
+    ##plotting
+    plot(graph, vertex.color=my_color)
+    ##plot(graph, vertex.color=my_color,layout=l)
+
+    if(length(C)>70)
+    {
+        cols=3
+        x_legend=-2.75
+    }else{
+        cols=2
+        x_legend=-2.2
+    }
+    legend(x=x_legend,y=0.8,
+           legend=levels(as.factor(V(graph)$gene)),
+           col = coul ,
+           bty = "n",
+           pch=20 ,
+           pt.cex = 3,
+           cex = 1,
+           text.col=coul,
+           horiz = FALSE,
+           ncol=cols,
+           inset = c(0.1, 0.1))
+    dev.off()
+    return(0)
 }
