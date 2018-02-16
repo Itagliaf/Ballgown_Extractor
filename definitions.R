@@ -375,7 +375,6 @@ SearchTranscriptGroup<-function(Name,ModulesFile,Transcripts)
 Network<-function(query,MODULES,DATA.FIL,corr,results)
 {
     load(MODULES)
-    load(DATA.FIL)
 
     if(length(corr)==0)
     {
@@ -396,13 +395,14 @@ Network<-function(query,MODULES,DATA.FIL,corr,results)
     datExpr_module<-datExpr[,module_line]
 
     A<-cor(datExpr_module)
+    print("Correlation matrix created")
     colnames(A)
 
     diag(A)<-0
     A[A<corr]=0
 
     row_col=match(query,colnames(A))
-    cor_vec=abs(A[,row <- col])
+    cor_vec=abs(A[,row_col])
     C<-names(sort(abs(A[,row_col]),decreasing=TRUE)[c(0:results)])
 
     D<-A[C,C]
@@ -411,40 +411,42 @@ Network<-function(query,MODULES,DATA.FIL,corr,results)
     print(rownames(A[C,C]))
 
     ##/20 is a maialata to stress distances between nodes
-    ##D<-(D[Lines_0,Lines_0])/20
+    D<-D/40
 
 
     C<-rownames(D)
 
     transcripts<-data.fil@expr$trans
 
-    library(igraph)
+    print("Create graph")
     graph<-graph_from_adjacency_matrix(D,mode="max",weighted=TRUE,diag=FALSE)
     ##to have a star layout
     ##to color the vertexes
-
-    V(graph)$gene=as.character(transcripts[match(C,transcripts$t <- name),]$gene <- name)
+    
+    V(graph)$gene=as.character(transcripts[match(C,transcripts$gene_id),]$gene_name)
+#    V(graph)$gene=as.character(transcripts[match(C,transcripts$t_name),]$gene_name)
     coul=rainbow(n=length(V(graph)$gene))
     my_color=coul[as.numeric(as.factor(V(graph)$gene))]
 
     graph<-simplify(graph)
     ##plotting
 
-    jpeg("Auto.jpeg",width=1080,heigh=720)
+    #jpeg("Auto.jpeg",width=1080,heigh=720)
     ##plotting
-    plot(graph, vertex.color=my_color)
-    ##plot(graph, vertex.color=my_color,layout=l)
 
+    plot(graph, vertex.color=my_color)
+
+    cols=2
+    print("Fixing Legend")
     if(length(C)>70)
     {
         cols=3
-        x_legend=-2.75
+
     }else{
         cols=2
-        x_legend=-2.2
     }
-    legend(x=x_legend,y=0.8,
-           legend=levels(as.factor(V(graph)$gene)),
+
+    legend(x=-2.75,y=0.8,legend=levels(as.factor(V(graph)$gene)),
            col = coul ,
            bty = "n",
            pch=20 ,
@@ -454,6 +456,6 @@ Network<-function(query,MODULES,DATA.FIL,corr,results)
            horiz = FALSE,
            ncol=cols,
            inset = c(0.1, 0.1))
-    dev.off()
-    return(0)
+    
+    return(graph)
 }
