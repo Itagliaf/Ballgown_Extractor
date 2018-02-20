@@ -57,41 +57,38 @@ PrintHelp<-function()
 SearchByTissue<-function(Tissue,Name,Transcripts)
     ##subsets the dataframe to extract only columns reguarding a certain tissue
 {
-    print("Search By Tissue")
     print(Tissue)
     print(Name)
     ##create FPKM.tissue and OUT.tissue strings
     paste("Plotting FKPM for tissue ",Tissue)
     Fpkm="FPKM"
     Out="OUT"
+
     TissueCol=paste(Fpkm,Tissue,"sep"=".")
     ##valutate the value of TissueCol and search it in Transcripts
     temp<-quote(TissueCol)
 
-    ##subset transcript with only the fpkm column
-    TransFpkm<-Transcripts[ ,eval(temp)]
-    
-    ##Add coverage column in the same way as before
+    #same with cov
     Cov="cov"
-    TissueCol=paste(Cov,Tissue,"sep"=".")
-    temp<-quote(TissueCol)
-    TransCov<-Transcripts[ ,eval(temp)]
+    TissueCov=paste(Cov,Tissue,"sep"=".")
+    temp<-quote(TissueCov)
 
-    ##create a dataframe that has the id's of the genes and the fpkm data
-    final<-merge(Transcripts$gene_name,TransFpkm,by=0,all=TRUE)
+    TranscriptsInfos<-Transcripts[2:10]
 
-    ##add the coverage values in a column
-    final$Coverage=TransCov
+    final<-Transcripts[2:10]
+    final$FPKM<-Transcripts[,TissueCol]
+    final$cov<-Transcripts[,TissueCov]
 
     ##rename the columns
-    colnames(final)<-c("ID","Gene_name","Fpkm","Coverage")
+    colnames(final)<-c("Chromosome","Strand","Start","End","t_name","Num_exons","Length","Gene_ID","Gene_Name","FPKM","Coverage")
     
-    if (!is.null(Name) & !is.na(Name))
+    if (!is.null(Name) & !is.na(Name) & Name!="")
     {
-        if(Name %in% final$Gene_name)
+
+        if(Name %in% final$Gene_Name)
         {
             attach(final)
-            final <- final[which(Gene_name==Name),]
+            final <- final[which(Gene_Name==Name),]
             detach(final)
         }
         else
@@ -173,7 +170,7 @@ SearchByFeature<-function(Name,Feature,data.fil,Phenodata)
     exclude<-grep("ucount",colnames(final))
     final<-final[,-exclude]
 
-    print(head(final))
+    
 
     NamesOriginal<-colnames(final)
     
@@ -198,7 +195,7 @@ SearchByFeature<-function(Name,Feature,data.fil,Phenodata)
 SearchByDiffFoldExpr<-function(Tissue1,Tissue2,Name,Transcripts)
     ##subsets the dataframe to extract only 2 tissues and confront their expression (fold expression)
 {
-    print("Search By Differential Exprewssion")
+    print("Search By Differential Expression")
     print(Tissue1)
     print(Tissue2)
     print(Name)
@@ -228,17 +225,26 @@ SearchByDiffFoldExpr<-function(Tissue1,Tissue2,Name,Transcripts)
     TransCov2<-Transcripts[,eval(temp2)]
 
     ##Creating a data table containing only the columns needed
-    LittleData<-merge(Transcripts$gene_name,TransFpkm1,by=0,all=TRUE)
-    LittleData$Transcript2=TransFpkm2
+    
+    LittleData<-Transcripts[,c(6,10)]
+    LittleData[,3]<-TransCov1
+    LittleData[,4]<-TransCov2
 
-    colnames(LittleData)<-c("ID","Gene_name",Tissue1,Tissue2)
+    colnames(LittleData)<-c("ID","Gene_Name",Tissue1,Tissue2)
 
-    if (!is.null(Name) & !is.na(Name))
+    if (!is.null(Name) && !is.na(Name) && Name!="")
     {
-        if(Name %in% LittleData$Gene_name)
+        print(!is.null(Name))
+        print(!is.na(Name))
+        print(Name)
+    }
+    
+    if (!is.na(Name) & !is.null(Name) & Name!="")
+    {
+        if(Name %in% LittleData$Gene_Name)
         {
             attach(LittleData)
-            LittleData <- LittleData[which(Gene_name==Name),]
+            LittleData <- LittleData[which(Gene_Name==Name),]
             detach(LittleData)
             #final<-results
         }
@@ -313,7 +319,7 @@ Plotter<-function(Genes,Transcripts)
     }
     tsubsetted<-t(subsetted)
 
-    ##row.names(tsubsetted)<-colnames(subsetted)
+    row.names(tsubsetted)<-colnames(subsetted)
 
     tsubsetted<-as.data.frame(tsubsetted)
     tsubsetted$tissue<-row.names(tsubsetted)
@@ -337,16 +343,119 @@ Plotter<-function(Genes,Transcripts)
             geom_bar(stat="identity",aes_string(x="tissue",y=gene,fill="tissue"))+
             theme_minimal()+
             labs(x="TISSUE",y=ylab_ok)+
-            theme(axis.text.x=element_text(angle=75,vjust=0.5,size=10))+
+            theme(axis.text.x=element_text(angle=75,vjust=0.5,size=15))+
             theme(axis.title.x=element_text(size=15))+
             theme(axis.text.y=element_text(size=15))+
             theme(axis.title.y=element_text(size=15))+
             theme(legend.position="none")
         
-        #png(filename=out_file,width = 1200, height = 800)
-        
-        #print(p)
-                                        #dev.off()
-        return(p)
     }
+    return(p)
+}
+
+SearchTranscriptGroup<-function(Name,ModulesFile,Transcripts)
+{
+    ##Name: gene name to be analyzed
+    ##ModulesFile: file containig informations about coexpression
+    ##modules (TOM files from WGCNA pipeline)
+
+    load(ModulesFile)
+
+    pos<-match(Name,colnames(datExpr))
+    geneModule<-moduleLabels[pos]
+
+    ##extracting all genes belongin to the module
+    Gene_Module<-names(datExpr)[moduleLabels==geneModule]
+    subsetted<-transcripts[transcripts$gene_id %in% Gene_Module,]
+                                        #    subsetted<-transcripts[transcripts$gene_name %in% Gene_Module,]
+        
+    return(subsetted[,c(1:10)])
+}
+
+Network<-function(query,MODULES,DATA.FIL,corr,results)
+{
+    load(MODULES)
+
+    if(length(corr)==0)
+    {
+        corr=0.9
+    }
+
+    if(length(results)==0)
+    {
+        results=50
+    }
+    match(query,colnames(datExpr))
+
+    query_position<-match(query,colnames(datExpr))
+    query_module<-moduleLabels[query_position]
+    query_module
+
+    module_line<-which(moduleLabels %in% query_module)
+    datExpr_module<-datExpr[,module_line]
+
+    A<-cor(datExpr_module)
+    print("Correlation matrix created")
+    colnames(A)
+
+    diag(A)<-0
+    A[A<corr]=0
+
+    row_col=match(query,colnames(A))
+    cor_vec=abs(A[,row_col])
+    C<-names(sort(abs(A[,row_col]),decreasing=TRUE)[c(0:results)])
+
+    D<-A[C,C]
+
+    print(C)
+    print(rownames(A[C,C]))
+
+    ##/20 is a maialata to stress distances between nodes
+    D<-D/40
+
+
+    C<-rownames(D)
+
+    transcripts<-data.fil@expr$trans
+
+    print("Create graph")
+    graph<-graph_from_adjacency_matrix(D,mode="max",weighted=TRUE,diag=FALSE)
+    ##to have a star layout
+    ##to color the vertexes
+    
+    V(graph)$gene=as.character(transcripts[match(C,transcripts$gene_id),]$gene_name)
+#    V(graph)$gene=as.character(transcripts[match(C,transcripts$t_name),]$gene_name)
+    coul=rainbow(n=length(V(graph)$gene))
+    my_color=coul[as.numeric(as.factor(V(graph)$gene))]
+
+    graph<-simplify(graph)
+    ##plotting
+
+    #jpeg("Auto.jpeg",width=1080,heigh=720)
+    ##plotting
+
+    plot(graph, vertex.color=my_color)
+
+    cols=2
+    print("Fixing Legend")
+    if(length(C)>70)
+    {
+        cols=3
+
+    }else{
+        cols=2
+    }
+
+    legend(x=-2.75,y=0.8,legend=levels(as.factor(V(graph)$gene)),
+           col = coul ,
+           bty = "n",
+           pch=20 ,
+           pt.cex = 3,
+           cex = 1,
+           text.col=coul,
+           horiz = FALSE,
+           ncol=cols,
+           inset = c(0.1, 0.1))
+    
+    return(graph)
 }

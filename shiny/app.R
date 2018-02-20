@@ -1,38 +1,36 @@
-library(shiny)
-library(ggplot2)
-##=== Loading functions ====
-source("definitions.R")
-
-##==== Loading and formatting data ====
-## load("data.fil.RData")
-## transcripts<-data.fil@expr$trans
-## head(transcripts)
-## phenodata<-read.csv("phenodata.csv","header"=TRUE)
-## colnames(transcripts)<-NameFormatter(transcripts,phenodata)
-##==== END ====
-
 #!!!! Attention: keep the "(" of fluid page on the same line
 ui <- fluidPage( #Begins a flui page (change when windows dimensions change)
-    navlistPanel( #Starts a panel environment: each search is a panel
+    tabsetPanel(
         tabPanel(
-            #A better name must be found
+            ##A better name must be found
             "Plotter",
-            verticalLayout
+           
+            fluidRow
             (
-                textInput
+                column
                 (
-                    inputId="gene_plot",
-                    label="Gene you want to analyze",
-                    value="STK33"
-                ),
-                actionButton
+                    width=4,
+                    textInput
+                    (
+                        inputId="gene_plot",
+                        label="Gene you want to analyze",
+                        value="STK33"
+                    ),
+                    actionButton
+                    (
+                        inputId="search_plot",
+                        label="Search"
+                    )
+                )
+            ),
+            fluidRow
+            (
+                column
                 (
-                    inputId="search_plot",
-                    label="Search"
-                ),
-                plotOutput(outputId="plot")
-               
-            )         
+                    width=12,
+                    plotOutput(outputId="plot")
+                )
+            )
         ),
         tabPanel( #Definition of a tab called search by tissue
             "Search By Tissue",
@@ -66,9 +64,11 @@ ui <- fluidPage( #Begins a flui page (change when windows dimensions change)
         ),
         tabPanel(#Definition of a tab called search by gene
             "Search By Gene",
-            sidebarLayout(
-                sidebarPanel(
-                    ## sliding bar that sets a value
+            fluidRow
+            (
+                column
+                (
+                    width=12,
                     textInput
                     (
                         inputId="gene_gene",
@@ -82,16 +82,18 @@ ui <- fluidPage( #Begins a flui page (change when windows dimensions change)
                         label="Search"
                     )
                 ),
-                mainPanel(
-                    tableOutput(outputId="SBG")
+                column
+                (
+                    width=12,
+                    dataTableOutput(outputId="SBG")
                 )
             )
         ),
         tabPanel(#Definition of a tab called search by gene feture
             "Search By Gene Feature",
-            sidebarLayout(
-                sidebarPanel(
-                    ## sliding bar that sets a value
+            fluidRow(
+                column(
+                    width=12,
                     textInput
                     (
                         inputId="gene_feature",
@@ -99,6 +101,7 @@ ui <- fluidPage( #Begins a flui page (change when windows dimensions change)
                         value="STK33",
                         placeholder="Your gene"
                     ),
+                    #buttons to choose the feature (intron or exon)
                     radioButtons
                     (
                         inputId="feature_feature",
@@ -112,8 +115,10 @@ ui <- fluidPage( #Begins a flui page (change when windows dimensions change)
                         label="Search"
                     )
                 ),
-                mainPanel(
-                    tableOutput(outputId="SBGF")
+                column
+                (
+                    width=12,
+                    dataTableOutput(outputId="SBGF")
                 )
             )
         ),
@@ -152,6 +157,81 @@ ui <- fluidPage( #Begins a flui page (change when windows dimensions change)
                     tableOutput(outputId="SBDF")
                 )
             )
+        ),
+        tabPanel(
+            "Search Transcriptiona Module",
+            sidebarLayout(
+                sidebarPanel(
+                    textInput
+                    (
+                        inputId="gene_module",
+                        label="Gene you want to analyze",
+                        value="gene1"
+                    ),
+                    actionButton
+                    (
+                        inputId="search_module",
+                        label="Search"
+                    )
+                    
+                ),
+                mainPanel(
+                    tableOutput(outputId="MO")
+                )
+            )
+        ),
+        tabPanel(
+            "Plot Network Graph",           
+            fluidRow
+            (
+                column
+                (
+                    width=4,
+                    textInput
+                    (
+                        inputId="transcript_network",
+                        label="Transcript you want to analyze",
+                        value="gene1"
+                    ),
+                    selectInput
+                    (
+                        inputId="correlation_network",
+                        label="Correlation threshold",
+                        choices=c(0.75,0.8,0.85,0.9,0.95),
+                        selected=0.8
+                    ),
+                    textInput
+                    (
+                        input="number_network",
+                        label="Number of nodes to be plotted",
+                        value=25
+                    ),
+                    actionButton
+                    (
+                        inputId="crate_network",
+                        label="Create"
+                    )
+                )
+            ),
+            fluidRow
+            (
+                column
+                (
+                    width=12,
+                    plotOutput
+                    (
+                        outputId="NT",
+                        width="1500px",
+                        height="720px",
+                        dblclick = "NT_dblclick",
+                        brush = brushOpts
+                        (
+                            id="NT_brush",
+                            resetOnNew = TRUE
+                        )
+                    )
+                )
+            )
         )
     )
 )
@@ -160,14 +240,12 @@ ui <- fluidPage( #Begins a flui page (change when windows dimensions change)
 server <- function(input, output) {
     ##output plotter
     output$plot<-renderPlot({
-        
         input$search_plot
         GENE<-isolate(input$gene_plot)
         Plotter(GENE,transcripts)
     })
     
-    ## #output search by tissue
-
+    ##output search by tissue
     output$SBT<-renderTable({
         input$search_tissue
         TISSUE<-isolate(input$tissue_tissue)
@@ -175,7 +253,7 @@ server <- function(input, output) {
         SearchByTissue(TISSUE,GENE,transcripts)
     })
 
-    output$SBG<-renderTable({
+    output$SBG<-renderDataTable({
         input$search_gene
         
         GENE<-isolate(input$gene_gene)
@@ -183,7 +261,7 @@ server <- function(input, output) {
     })
     
     ##output search by gene feature
-    output$SBGF<-renderTable({
+    output$SBGF<-renderDataTable({
         input$search_feature
         
         GENE<-isolate(input$gene_feature)
@@ -199,6 +277,21 @@ server <- function(input, output) {
         GENE<-isolate(input$gene_fold)
         SearchByDiffFoldExpr(TISSUE1,TISSUE2,GENE,transcripts)
     })
+
+    output$MO<-renderTable({
+        input$search_module
+        GENE<-isolate(input$gene_module)
+        SearchTranscriptGroup(GENE,"LITTLE_1000_Module_Data.Rdata","Little_1000_TOM-block.1.RData")
+    })
+
+    output$NT<-renderPlot({
+        input$crate_network
+        TRAN<-isolate(input$transcript_network)
+        COR<-isolate(input$correlation_network)
+        NUM<-isolate(input$number_network)
+        Network(TRAN,"LITTLE_1000_Module_Data.Rdata",data.fil,COR,NUM)        
+    })
+
 }
 
 shinyApp(ui, server)

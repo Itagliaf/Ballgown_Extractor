@@ -1,6 +1,11 @@
 ##---- Preamble: Importing Libraries----
 library(ggplot2)
-#---------------------------------------
+library(Cairo)
+library(igraph)
+libraru
+#antialiasing
+options(shiny.usecairo=T)
+##---------------------------------------
 
 ##----- Importing function definitions ----
 source("definitions.R")
@@ -15,7 +20,7 @@ args <- commandArgs(TRUE)
 #Sanity check: there are arguments?
 if (length(args)==0)
 {
-    PrintHelp()
+    PrintHelp(0)
 }
 
 if (args[1]==99 && length(args)<4)
@@ -178,6 +183,42 @@ switch(args[1],
                out_file=paste("SearchFold",args[2],args[3],File_Hash,sep="_")
                write.table(Fold_Done, out_file,row.names=FALSE,col.names=TRUE)
            },
+       "6"=if(length(args)<3)
+           {
+               print("Search coexpression group")
+               print("Argument 2: Gene name to ben analyzed")
+               print("Argument 3: file containig informations about coexpression")
+               print("Argument 4: TOM files from WGCNA pipeline")
+               print("Exiting")
+               stop("Insufficient Arguments")
+           }else
+           {
+               print("Search coexpression group")
+               ##Name: gene name to be analyzed
+               ##ModulesFile: file containig informations about coexpression
+               ##modules (TOM files from WGCNA pipeline)
+               Gene_Module<-SearchTranscriptGroup(args[2],args[3],transcripts)
+               print(Gene_Module)
+           },
+       "7"=if(length(args)<5)
+           {
+               print("Create Network Graph")
+               print("Argument 2: Query transcript/gene")
+               print("Argument 3: file containig informations about coexpression")
+               print("Argument 4: data.fil")
+               print("Argument 5: correlation threashold to link 2 nodes")
+               print("Argument 6: how many results needs to be plotted")
+               print("Exiting")
+               stop("Insufficient Arguments")
+           }else
+           {
+               print("Search coexpression group")
+               ##Name: gene name to be analyzed
+               ##ModulesFile: file containig informations about coexpression
+               ##modules (TOM files from WGCNA pipeline)
+               Gene <- Module<-SearchTranscriptGroup(args[2],args[3],transcripts)
+               print(Gene <- Module)
+                          },
        PrintHelp()
        
 )
