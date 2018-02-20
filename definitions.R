@@ -19,7 +19,7 @@ NameFormatter<-function(Transcripts,phenodata)
         TissueCov=paste(Cov,Folders,"sep"=".")
 
         ##If TissueCol is found in the names of the transcripts, sobstitute the name
-        if(TissueCol%in%colnames(transcripts))
+        if(TissueCol%in%colnames(Transcripts))
         {
             pos<-match(TissueCol,NamesOriginal)
             tissue<-phenodata[i,2]
