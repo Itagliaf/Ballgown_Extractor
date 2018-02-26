@@ -124,3 +124,16 @@ if sys.argv[1]=="3":
     out_file.write(str(Gene))
     out_file.close
 
+if sys.argv[1]=="4":
+    SearchByFeature=robjects.r('SearchByFeature')
+    data_fil=robjects.r('data.fil')
+    phenodata=robjects.r('phenodata')
+    if len(sys.argv)==4:
+        Feature=SearchByFeature(str(sys.argv[2]),str(sys.argv[3]),data_fil,phenodata)
+    else:
+        Feature=SearchByFeature(str(sys.argv[2]),'',data_fil,phenodata)
+
+
+    out_file=open("SearchFeature.tsv","w",5000000)
+    out_file.write(str(Feature))
+    out_file.close
