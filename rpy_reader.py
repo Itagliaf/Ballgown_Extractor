@@ -14,43 +14,48 @@ igraph=rpackages.importr("igraph")
 #==== PREMABLE ENDS ====
 
 #---- Importing functions ----
-base.source("definitions.R")
+definitions=base.source("definitions.R")
 
-#---- creating data.fil.Rdata
-#print(sys.argv[1])
+#---- Is the first argument defined? ----
 
-# if sys.argv[1]=="99":
-#     ballgown=rpackages.importr("ballgown")
-#     dplyr=rpackages.importr("dplyr",on_conflict="warn")
-#     genefilter=rpackages.importr("genefilter")
+if len(sys.argv)<2:
+    print("No arguments given")
+    PrintHelp=robjects.r('PrintHelp')
+    PrintHelp(0)
+    sys.exit(-1)
 
-#     robjects.r(
-#         '''
-#         print("Importing data")                                                                                                                           
-#         ##args[2] Mapping file                                                                                                                            
-#         ##args[3] Folder with data                                                                                                                        
-#         ##args[4] Common Part                                                                                                                             
+if sys.argv[1] and sys.argv[1]=="99":
+    ballgown=rpackages.importr("ballgown")
+    dplyr=rpackages.importr("dplyr",on_conflict="warn")
+    genefilter=rpackages.importr("genefilter")
+
+    robjects.r(
+        '''
+        print("Importing data")                                                                                                                           
+        ##args[2] Mapping file                                                                                                                            
+        ##args[3] Folder with data                                                                                                                        
+        ##args[4] Common Part                                                                                                                             
         
-#         ##phenodata: reports name of folders where input are stored and the tissue they refer to.                                                         
-#         phenodata<-read.csv("phenodata.csv","header"=TRUE)                                                                                                        
+        ##phenodata: reports name of folders where input are stored and the tissue they refer to.                                                         
+        phenodata<-read.csv("phenodata.csv","header"=TRUE)                                                                                                        
                                                                                                                                                       
-#         #ballgown class: imports data from the data from outside folders                                                                                  
-#         data <- ballgown( dataDir = "/home/itagliaferri/Documents/Progeti/Chillemi/SAMPLES",
-#         samplePattern = "ERR",                                                                                                             
-#         bamfiles = NULL,                                                                                                                     
-#         pData = phenodata,                                                                                                                   
-#         verbose = TRUE,                                                                                                                      
-#         meas = "all")                                                                                                                        
-#         #Issue: pdata in ballgow costructor doesn't work,                                                                                                 
-#         #Proceding in making it "manually"                                                                                                                
-#         pData(data)=phenodata
-#         #Getting only the genes with a significat variance between expressions in tissues                                                                 
-#         data.fil = subset(data,"rowVars(texpr(data))>1",genomesubset=TRUE)                                                                                
+        #ballgown class: imports data from the data from outside folders                                                                                  
+        data <- ballgown( dataDir = "/mnt/disk2/bufalo/data/SAMPLES",
+        samplePattern = "ERR",                                                                                                             
+        bamfiles = NULL,                                                                                                                     
+        pData = phenodata,                                                                                                                   
+        verbose = TRUE,                                                                                                                      
+        meas = "all")                                                                                                                        
+        #Issue: pdata in ballgow costructor doesn't work,                                                                                                 
+        #Proceding in making it "manually"                                                                                                                
+        pData(data)=phenodata
+        #Getting only the genes with a significat variance between expressions in tissues                                                                 
+        data.fil = subset(data,"rowVars(texpr(data))>1",genomesubset=TRUE)                                                                                
     
-#         save(data.fil,file="data.fil.RData")                                                                                                              
+        save(data.fil,file="data.fil.RData")                                                                                                              
     
-#         ''')
-#     print("Your data are stored in data.fil.RData")
+        ''')
+    print("Your data are stored in data.fil.RData")
 
 
 #---- Loading Data ----
@@ -97,8 +102,25 @@ robjects.r(
 
 #==== FUNCTIONS RUN ====
 
-options = {0 : PrintHelp(0),
-           1 : Plotter(sys.argv[2],)
-           }
+transcripts=robjects.r('transcripts')
 
-options[sys.argv[1]]()
+if sys.argv[1]=="2":
+    if len(sys.argv)==4:
+        SearchByTissue=robjects.r('SearchByTissue')
+        Tissue=SearchByTissue(str(sys.argv[2]),str(sys.argv[3]),transcripts)
+    else:
+        SearchByTissue=robjects.r('SearchByTissue')
+        Tissue=SearchByTissue(str(sys.argv[2]),"",transcripts)
+
+    out_file=open("SearchTissue.tsv","w",5000000)
+    out_file.write(str(Tissue))
+    out_file.close
+        
+if sys.argv[1]=="3":
+    SearchByGene=robjects.r('SearchByGene')
+    Gene=SearchByGene(str(sys.argv[2]),transcripts)
+
+    out_file=open("SearchGene.tsv","w",5000000)
+    out_file.write(str(Gene))
+    out_file.close
+
