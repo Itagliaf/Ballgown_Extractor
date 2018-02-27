@@ -3,12 +3,18 @@ import sys
 import rpy2
 import rpy2.robjects as robjects
 import rpy2.robjects.packages as rpackages 
+import rpy2.robjects.lib.ggplot2 as ggplot2
+from rpy2.robjects.lib import grid
 
 #==== PREAMBLE: r packages import ====
 base=rpackages.importr("base")
 ggplot2=rpackages.importr("ggplot2")
 Cairo=rpackages.importr("Cairo")
 igraph=rpackages.importr("igraph")
+#Necessary to import graphical devices
+grdevices=rpackages.importr('grDevices')
+
+grid.activate()
 
 # !!! Import options??? !!!
 #==== PREMABLE ENDS ====
@@ -103,7 +109,15 @@ robjects.r(
 #==== FUNCTIONS RUN ====
 
 transcripts=robjects.r('transcripts')
+phenodata=robjects.r('phenodata')
 
+if sys.argv[1]=="1":
+    if len(sys.argv)==2:
+        #grdevices.png(file="/home/tagliaferri/NewPlot.png",width="512",heigth="512")
+        rplot(Plotter=robjects.r('Plotter'))
+        #Plot=Plotter(sys.argv[2],transcripts)
+        #grdevices.dev_off()
+        
 if sys.argv[1]=="2":
     if len(sys.argv)==4:
         SearchByTissue=robjects.r('SearchByTissue')
@@ -127,7 +141,6 @@ if sys.argv[1]=="3":
 if sys.argv[1]=="4":
     SearchByFeature=robjects.r('SearchByFeature')
     data_fil=robjects.r('data.fil')
-    phenodata=robjects.r('phenodata')
     if len(sys.argv)==4:
         Feature=SearchByFeature(str(sys.argv[2]),str(sys.argv[3]),data_fil,phenodata)
     else:
@@ -137,3 +150,24 @@ if sys.argv[1]=="4":
     out_file=open("SearchFeature.tsv","w",5000000)
     out_file.write(str(Feature))
     out_file.close
+
+if sys.argv[1]=="5":
+    SearchByDiffFoldExpr=robjects.r('SearchByDiffFoldExpr')
+    if len(sys.argv)==5:
+        Fold=SearchByDiffFoldExpr(str(sys.argv[2]),str(sys.argv[3]),str(sys.argv[4]),transcripts)
+    else:
+        Fold=SearchByDiffFoldExpr(str(sys.argv[2]),str(sys.argv[3]),"",transcripts)
+    
+    out_file=open("SearchFold.tsv","w",5000000)
+    out_file.write(str(Fold))
+    out_file.close
+
+if sys.argv[1]=="6":
+    SearchTranscriptGroup=robjects.r('SearchTranscriptGroup')
+    Module=SearchTranscriptGroup(str(sys.argv[2]),str(sys.argv[3]),transcripts)
+
+    out_file=open("SearchModule.tsv","w",5000000)
+    out_file.write(str(Module))
+    out_file.close
+
+    
