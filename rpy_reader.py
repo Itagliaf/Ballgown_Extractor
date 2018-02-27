@@ -27,7 +27,7 @@ definitions=base.source("definitions.R")
 if len(sys.argv)<2:
     print("No arguments given")
     PrintHelp=robjects.r('PrintHelp')
-    PrintHelp(0)
+    PrintHelp(str(0))
     sys.exit(-1)
 
 if sys.argv[1] and sys.argv[1]=="99":
@@ -169,5 +169,3 @@ if sys.argv[1]=="6":
     out_file=open("SearchModule.tsv","w",5000000)
     out_file.write(str(Module))
     out_file.close
-
-    
