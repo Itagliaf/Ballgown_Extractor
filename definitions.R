@@ -385,11 +385,9 @@ Network<-function(query,MODULES,DATA.FIL,corr,results)
     {
         results=50
     }
-    match(query,colnames(datExpr))
 
     query_position<-match(query,colnames(datExpr))
     query_module<-moduleLabels[query_position]
-    query_module
 
     module_line<-which(moduleLabels %in% query_module)
     datExpr_module<-datExpr[,module_line]
@@ -399,63 +397,67 @@ Network<-function(query,MODULES,DATA.FIL,corr,results)
     colnames(A)
 
     diag(A)<-0
-    A[A<corr]=0
+    A[abs(A)<corr]=0
 
     row_col=match(query,colnames(A))
     cor_vec=abs(A[,row_col])
     C<-names(sort(abs(A[,row_col]),decreasing=TRUE)[c(0:results)])
 
+    if(query%in%C){
+        print("Query gene is in C")
+    }else{
+        C[results]<-query
+    }
     D<-A[C,C]
 
-    print(C)
     print(rownames(A[C,C]))
 
-    ##/20 is a maialata to stress distances between nodes
+    ##D/40 to stress distances between nodes
     D<-D/40
-
-
-    C<-rownames(D)
 
     transcripts<-data.fil@expr$trans
 
     print("Create graph")
+
+    rownames(D)<-as.character(transcripts[match(C,transcripts$gene_id),]$gene_name)
+    colnames(D)<-as.character(transcripts[match(C,transcripts$gene_id),]$gene_name)
     graph<-graph_from_adjacency_matrix(D,mode="max",weighted=TRUE,diag=FALSE)
     ##to have a star layout
     ##to color the vertexes
     
-    V(graph)$gene=as.character(transcripts[match(C,transcripts$gene_id),]$gene_name)
+    #V(graph)$gene=as.character(transcripts[match(C,transcripts$gene_id),]$gene_name)
 #    V(graph)$gene=as.character(transcripts[match(C,transcripts$t_name),]$gene_name)
-    coul=rainbow(n=length(V(graph)$gene))
-    my_color=coul[as.numeric(as.factor(V(graph)$gene))]
+    #coul=rainbow(n=length(V(graph)$gene))
+    #my_color=coul[as.numeric(as.factor(V(graph)$gene))]
 
     graph<-simplify(graph)
     ##plotting
 
-    #jpeg("Auto.jpeg",width=1080,heigh=720)
-    ##plotting
+    png("Auto.png",width=1080,heigh=720)
 
-    plot(graph, vertex.color=my_color)
+    #plot(graph, vertex.color="white",vertex.shape="vrectangle", vertex.label.color=my_color,label.degree="-p/2")
+    plot(graph,vertex.color="white",vertex.shape="vrectangle")
+    ## cols=2
+    ## print("Fixing Legend")
+    ## if(length(C)>70)
+    ## {
+    ##     cols=3
 
-    cols=2
-    print("Fixing Legend")
-    if(length(C)>70)
-    {
-        cols=3
+    ## }else{
+    ##     cols=2
+    ## }
 
-    }else{
-        cols=2
-    }
+    ## legend(x=-2,y=0.8,legend=levels(as.factor(V(graph)$gene)),
+    ##        col = coul ,
+    ##        bty = "n",
+    ##        pch=20 ,
+    ##        pt.cex = 3,
+    ##        cex = 1,
+    ##        text.col=coul,
+    ##        horiz = FALSE,
+    ##        ncol=cols,
+    ##        inset = c(0.1, 0.1))
 
-    legend(x=-2.75,y=0.8,legend=levels(as.factor(V(graph)$gene)),
-           col = coul ,
-           bty = "n",
-           pch=20 ,
-           pt.cex = 3,
-           cex = 1,
-           text.col=coul,
-           horiz = FALSE,
-           ncol=cols,
-           inset = c(0.1, 0.1))
-    
+    dev.off()
     return(graph)
 }
