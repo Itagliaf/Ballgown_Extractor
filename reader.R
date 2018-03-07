@@ -2,7 +2,7 @@
 library(ggplot2)
 library(Cairo)
 library(igraph)
-libraru
+
 #antialiasing
 options(shiny.usecairo=T)
 ##---------------------------------------
@@ -216,9 +216,8 @@ switch(args[1],
                ##Name: gene name to be analyzed
                ##ModulesFile: file containig informations about coexpression
                ##modules (TOM files from WGCNA pipeline)
-               Gene <- Module<-SearchTranscriptGroup(args[2],args[3],transcripts)
-               print(Gene <- Module)
-                          },
-       PrintHelp()
+	       Net<-Network(args[2],args[3],data.fil,args[4],args[5])    
+           },
+	   PrintHelp()	
        
 )

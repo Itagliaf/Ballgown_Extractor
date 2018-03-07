@@ -386,6 +386,7 @@ Network<-function(query,MODULES,DATA.FIL,corr,results)
         results=50
     }
 
+    colnames(datExpr)<-as.character(transcripts[match(colnames(datExpr),transcripts$gene_id),]$gene_name)
     query_position<-match(query,colnames(datExpr))
     query_module<-moduleLabels[query_position]
 
@@ -426,7 +427,7 @@ Network<-function(query,MODULES,DATA.FIL,corr,results)
     ##to color the vertexes
     
     #V(graph)$gene=as.character(transcripts[match(C,transcripts$gene_id),]$gene_name)
-#    V(graph)$gene=as.character(transcripts[match(C,transcripts$t_name),]$gene_name)
+    #V(graph)$gene=as.character(transcripts[match(C,transcripts$t_name),]$gene_name)
     #coul=rainbow(n=length(V(graph)$gene))
     #my_color=coul[as.numeric(as.factor(V(graph)$gene))]
 
