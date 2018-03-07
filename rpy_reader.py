@@ -13,11 +13,13 @@ Cairo=rpackages.importr("Cairo")
 igraph=rpackages.importr("igraph")
 #Necessary to import graphical devices
 grdevices=rpackages.importr('grDevices')
+#R print function
+rprint = robjects.globalenv.get("print")
 
 grid.activate()
 
 # !!! Import options??? !!!
-#==== PREMABLE ENDS ====
+#==== PREAMBLE ENDS ====
 
 #---- Importing functions ----
 definitions=base.source("definitions.R")
@@ -111,12 +113,11 @@ robjects.r(
 transcripts=robjects.r('transcripts')
 phenodata=robjects.r('phenodata')
 
-if sys.argv[1]=="1":
-    if len(sys.argv)==2:
-        #grdevices.png(file="/home/tagliaferri/NewPlot.png",width="512",heigth="512")
-        rplot(Plotter=robjects.r('Plotter'))
-        #Plot=Plotter(sys.argv[2],transcripts)
-        #grdevices.dev_off()
+if str(sys.argv[1])=="1":
+    if len(sys.argv)==3:
+        Plotter=robjects.r('Plotter')
+        Plot=Plotter(sys.argv[2],transcripts)
+        rprint(Plot)
         
 if sys.argv[1]=="2":
     if len(sys.argv)==4:
