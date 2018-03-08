@@ -1,5 +1,6 @@
 #==== PREAMBLE: python packages import ====
 import sys
+import datetime
 import rpy2
 import rpy2.robjects as robjects
 import rpy2.robjects.packages as rpackages 
@@ -113,6 +114,11 @@ robjects.r(
 transcripts=robjects.r('transcripts')
 phenodata=robjects.r('phenodata')
 
+#to format output files name
+now = datetime.datetime.now()
+time=now.strftime("%Y%m%d%H%M")
+
+
 if str(sys.argv[1])=="1":
     if len(sys.argv)==3:
         Plotter=robjects.r('Plotter')
@@ -127,7 +133,9 @@ if sys.argv[1]=="2":
         SearchByTissue=robjects.r('SearchByTissue')
         Tissue=SearchByTissue(str(sys.argv[2]),"",transcripts)
 
-    out_file=open("SearchTissue.tsv","w",5000000)
+
+    out_name="SearchTissue_"+sys.argv[2]+"_"+time+".tsv"
+    out_file=open(out_name,"w",5000000)
     out_file.write(str(Tissue))
     out_file.close
         
@@ -135,7 +143,8 @@ if sys.argv[1]=="3":
     SearchByGene=robjects.r('SearchByGene')
     Gene=SearchByGene(str(sys.argv[2]),transcripts)
 
-    out_file=open("SearchGene.tsv","w",5000000)
+    out_name="SearchGene_"+sys.argv[2]+"_"+time+".tsv"
+    out_file=open(out_name,"w",5000000)
     out_file.write(str(Gene))
     out_file.close
 
@@ -147,8 +156,8 @@ if sys.argv[1]=="4":
     else:
         Feature=SearchByFeature(str(sys.argv[2]),'',data_fil,phenodata)
 
-
-    out_file=open("SearchFeature.tsv","w",5000000)
+    out_name="SearchFeature_"+sys.argv[2]+"_"+sys.argv[3]+"_"+time+".tsv"
+    out_file=open(out_name,"w",5000000)
     out_file.write(str(Feature))
     out_file.close
 
@@ -158,16 +167,18 @@ if sys.argv[1]=="5":
         Fold=SearchByDiffFoldExpr(str(sys.argv[2]),str(sys.argv[3]),str(sys.argv[4]),transcripts)
     else:
         Fold=SearchByDiffFoldExpr(str(sys.argv[2]),str(sys.argv[3]),"",transcripts)
-    
-    out_file=open("SearchFold.tsv","w",5000000)
+
+    out_name="SearchFold_"+sys.argv[2]+"_"+sys.argv[3]+"_"+time+".tsv"
+    out_file=open(out_name,"w",5000000)
     out_file.write(str(Fold))
     out_file.close
 
 if sys.argv[1]=="6":
     SearchTranscriptGroup=robjects.r('SearchTranscriptGroup')
-    Module=SearchTranscriptGroup(str(sys.argv[2]),str(sys.argv[3]),transcripts)
+    Module=SearchTranscriptGroup(str(sys.argv[2]),str(sys.argv[3]),str(sys.argv[4]),transcripts)
 
-    out_file=open("SearchModule.tsv","w",5000000)
+    out_name="SearchExpressionModule_"+sys.argv[2]+"_"+time+".tsv"
+    out_file=open(out_name,"w",5000000)
     out_file.write(str(Module))
     out_file.close
 

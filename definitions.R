@@ -58,6 +58,7 @@ SearchByTissue<-function(Tissue,Name,Transcripts)
     ##subsets the dataframe to extract only columns reguarding a certain tissue
 {
     print(Tissue)
+    Name<-toupper(Name)
     print(Name)
     ##create FPKM.tissue and OUT.tissue strings
     paste("Plotting FKPM for tissue ",Tissue)
@@ -105,6 +106,7 @@ SearchByGene<-function(Name,Transcripts)
     ##subsets the dataframe to extract only lines with a certain gene_name (gene symbol)
 {
     print("Search By Gene")
+    Name<-toupper(Name)
     print(Name)
 
     ##if the gene is oresente in the column gene_name
@@ -127,6 +129,7 @@ SearchByFeature<-function(Name,Feature,data.fil,Phenodata)
     ##data.fil must be input (presents informations about the intron, exon and so on.
 {
     print("Search By Gene Feature")
+    Name<-toupper(Name)
     print(Name)
     print(Feature)
     
@@ -198,6 +201,7 @@ SearchByDiffFoldExpr<-function(Tissue1,Tissue2,Name,Transcripts)
     print("Search By Differential Expression")
     print(Tissue1)
     print(Tissue2)
+    Name<-toupper(Name)
     print(Name)
     
     ##Extract FPKM values from the tissues 
@@ -353,26 +357,49 @@ Plotter<-function(Genes,Transcripts)
     return(p)
 }
 
-SearchTranscriptGroup<-function(Name,ModulesFile,Transcripts)
+SearchTranscriptGroup<-function(query_type,Name,ModulesFile,Transcripts)
 {
-    ##Name: gene name to be analyzed
+    ##Name: gene name to be analyzed (es gene77) or gene symbol (es STK33)
     ##ModulesFile: file containig informations about coexpression
     ##modules (TOM files from WGCNA pipeline)
 
     load(ModulesFile)
+    
+    if(query_type=="symbol")
+    {
+        #all gene symbols are upper cases
+        Name<-toupper(Name)
+        
+        colnames(datExpr)<-as.character(Transcripts[match(colnames(datExpr),transcripts$gene_id),]$gene_name)
+        pos<-match(Name,colnames(datExpr))
+    }
 
-    pos<-match(Name,colnames(datExpr))
+    ##probably redundant
+    if(query_type=="gene_name")
+    {
+        pos<-match(Name,colnames(datExpr))
+    }
+    
+    
     geneModule<-moduleLabels[pos]
 
     ##extracting all genes belongin to the module
     Gene_Module<-names(datExpr)[moduleLabels==geneModule]
-    subsetted<-transcripts[transcripts$gene_id %in% Gene_Module,]
-                                        #    subsetted<-transcripts[transcripts$gene_name %in% Gene_Module,]
-        
+
+    if(query_type=="symbol")
+    {
+        subsetted<-transcripts[transcripts$gene_name %in% Gene_Module,]
+    }
+
+    if(query_type=="gene_name")
+    {
+        subsetted<-transcripts[transcripts$gene_id %in% Gene_Module,]
+    }
+            
     return(subsetted[,c(1:10)])
 }
 
-Network<-function(query_type,query,MODULES,DATA.FIL,corr,results)
+Network<-function(query_type,query,MODULES,Transcripts,corr,results)
 {
 
     ## == Sanity checks ==
@@ -382,8 +409,6 @@ Network<-function(query_type,query,MODULES,DATA.FIL,corr,results)
         stop("Argument 1 not recognized")
     }
 
-    
-    
     if(file.exists(MODULES))
     {
         load(MODULES)
@@ -406,7 +431,7 @@ Network<-function(query_type,query,MODULES,DATA.FIL,corr,results)
     ## == End of Defaults ==
 
     ## importing transcripts data
-    transcripts<-data.fil@expr$trans
+    ##transcripts<-data.fil@expr$trans
     
     ##== The query is the gene symbol or gene name? ==
     
@@ -414,7 +439,6 @@ Network<-function(query_type,query,MODULES,DATA.FIL,corr,results)
     {
         #all gene symbols are upper cases
         query<-toupper(query)
-        print(query)
         
         colnames(datExpr)<-as.character(transcripts[match(colnames(datExpr),transcripts$gene_id),]$gene_name)
 
@@ -452,8 +476,6 @@ Network<-function(query_type,query,MODULES,DATA.FIL,corr,results)
     }
     D<-A[C,C]
 
-    print(rownames(A[C,C]))
-
     ##D/40 to stress distances between nodes
     D<-D/40
 
@@ -488,7 +510,7 @@ Network<-function(query_type,query,MODULES,DATA.FIL,corr,results)
         
         V(graph)$color<-"white"
         V(graph)[query]$color<-"red"
-        
+        V(graph)$shape<-"vrectangle"
         graph<-simplify(graph)
 
         
@@ -498,12 +520,6 @@ Network<-function(query_type,query,MODULES,DATA.FIL,corr,results)
         png("Auto.png",width=1080,heigh=720)
         
         plot(graph, vertex.shape="vrectangle", vertex.label.color=my_color,label.degree="-p/2")
-
-        
-
-
-        ##[query_name%in%V(graph)$gene]<-"red"
-
         
         cols=2
         print("Fixing Legend")
@@ -525,9 +541,6 @@ Network<-function(query_type,query,MODULES,DATA.FIL,corr,results)
                horiz = FALSE,
                ncol=cols,
                inset = c(0.1, 0.1))
-        dev.off()
-    }
-
-    
+    }    
     return(graph)
 }
