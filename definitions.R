@@ -372,10 +372,28 @@ SearchTranscriptGroup<-function(Name,ModulesFile,Transcripts)
     return(subsetted[,c(1:10)])
 }
 
-Network<-function(query,MODULES,DATA.FIL,corr,results)
+Network<-function(query_type,query,MODULES,DATA.FIL,corr,results)
 {
-    load(MODULES)
 
+    ## == Sanity checks ==
+    if(query_type!="gene_name" & query_type!="symbol")
+    {
+        print("Choose between 'gene_name' and 'symbol'")
+        stop("Argument 1 not recognized")
+    }
+
+    
+    
+    if(file.exists(MODULES))
+    {
+        load(MODULES)
+    }else{
+        print("File not found. Makes sure that the file containing the modules is correct")
+    }
+    
+    ##== END ==
+
+    ## == Default vaules of correlation and number of results ==
     if(length(corr)==0)
     {
         corr=0.9
@@ -385,10 +403,33 @@ Network<-function(query,MODULES,DATA.FIL,corr,results)
     {
         results=50
     }
+    ## == End of Defaults ==
 
-    colnames(datExpr)<-as.character(transcripts[match(colnames(datExpr),transcripts$gene_id),]$gene_name)
-    query_position<-match(query,colnames(datExpr))
-    query_module<-moduleLabels[query_position]
+    ## importing transcripts data
+    transcripts<-data.fil@expr$trans
+    
+    ##== The query is the gene symbol or gene name? ==
+    
+    if(query_type=="symbol")
+    {
+        #all gene symbols are upper cases
+        query<-toupper(query)
+        print(query)
+        
+        colnames(datExpr)<-as.character(transcripts[match(colnames(datExpr),transcripts$gene_id),]$gene_name)
+
+        query_position<-match(query,colnames(datExpr))
+        query_module<-moduleLabels[query_position]
+    }
+
+    ## probably redundant
+    if(query_type=="gene_name")
+    {
+        query_position<-match(query,colnames(datExpr))
+        query_module<-moduleLabels[query_position]
+    }
+
+    ##== END ==
 
     module_line<-which(moduleLabels %in% query_module)
     datExpr_module<-datExpr[,module_line]
@@ -416,49 +457,77 @@ Network<-function(query,MODULES,DATA.FIL,corr,results)
     ##D/40 to stress distances between nodes
     D<-D/40
 
-    transcripts<-data.fil@expr$trans
-
     print("Create graph")
 
-    rownames(D)<-as.character(transcripts[match(C,transcripts$gene_id),]$gene_name)
-    colnames(D)<-as.character(transcripts[match(C,transcripts$gene_id),]$gene_name)
-    graph<-graph_from_adjacency_matrix(D,mode="max",weighted=TRUE,diag=FALSE)
-    ##to have a star layout
-    ##to color the vertexes
     
-    #V(graph)$gene=as.character(transcripts[match(C,transcripts$gene_id),]$gene_name)
-    #V(graph)$gene=as.character(transcripts[match(C,transcripts$t_name),]$gene_name)
-    #coul=rainbow(n=length(V(graph)$gene))
-    #my_color=coul[as.numeric(as.factor(V(graph)$gene))]
+    if(query_type=="symbol")
+    {
+        graph<-graph_from_adjacency_matrix(D,mode="max",weighted=TRUE,diag=FALSE)
 
-    graph<-simplify(graph)
-    ##plotting
+        graph<-simplify(graph)
 
-    png("Auto.png",width=1080,heigh=720)
+        
+        V(graph)$color<-"white"
+        V(graph)[query]$color<-"red"        
+        ##plotting
+        
+        png("Auto.png",width=1080,heigh=720)
+        plot(graph,vertex.shape="vrectangle")
+        dev.off()
+    }
 
-    #plot(graph, vertex.color="white",vertex.shape="vrectangle", vertex.label.color=my_color,label.degree="-p/2")
-    plot(graph,vertex.color="white",vertex.shape="vrectangle")
-    ## cols=2
-    ## print("Fixing Legend")
-    ## if(length(C)>70)
-    ## {
-    ##     cols=3
+    if(query_type=="gene_name")
+    {
+    
+        graph<-graph_from_adjacency_matrix(D,mode="max",weighted=TRUE,diag=FALSE)
+            
+        V(graph)$gene=as.character(transcripts[match(C,transcripts$gene_id),]$gene_name)
+        #V(graph)$gene=as.character(transcripts[match(C,transcripts$t_name),]$gene_name)
+        coul=rainbow(n=length(V(graph)$gene))
+        my_color=coul[as.numeric(as.factor(V(graph)$gene))]
+        
+        V(graph)$color<-"white"
+        V(graph)[query]$color<-"red"
+        
+        graph<-simplify(graph)
 
-    ## }else{
-    ##     cols=2
-    ## }
+        
+        ##plotting
 
-    ## legend(x=-2,y=0.8,legend=levels(as.factor(V(graph)$gene)),
-    ##        col = coul ,
-    ##        bty = "n",
-    ##        pch=20 ,
-    ##        pt.cex = 3,
-    ##        cex = 1,
-    ##        text.col=coul,
-    ##        horiz = FALSE,
-    ##        ncol=cols,
-    ##        inset = c(0.1, 0.1))
+        
+        png("Auto.png",width=1080,heigh=720)
+        
+        plot(graph, vertex.shape="vrectangle", vertex.label.color=my_color,label.degree="-p/2")
 
-    dev.off()
+        
+
+
+        ##[query_name%in%V(graph)$gene]<-"red"
+
+        
+        cols=2
+        print("Fixing Legend")
+        if(length(C)>70)
+        {
+            cols=3
+            
+        }else{
+            cols=2
+        }
+
+        legend(x=-2,y=0.8,legend=levels(as.factor(V(graph)$gene)),
+               col = coul ,
+               bty = "n",
+               pch=20 ,
+               pt.cex = 3,
+               cex = 1,
+               text.col=coul,
+               horiz = FALSE,
+               ncol=cols,
+               inset = c(0.1, 0.1))
+        dev.off()
+    }
+
+    
     return(graph)
 }

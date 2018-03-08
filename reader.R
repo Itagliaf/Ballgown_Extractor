@@ -15,7 +15,6 @@ source("definitions.R")
 #Feeding arguments to the script
 args <- commandArgs(TRUE)
 
-
 ##-- Importing files --
 #Sanity check: there are arguments?
 if (length(args)==0)
@@ -65,7 +64,7 @@ if (args[1]==99 && length(args)<4)
     save(data.fil,file="data.fil.RData")
 
     print("Your data are stored in data.fil.RData")
-    stop("All done: exiting")
+    print("All done: exiting")
 }
 
 ## -- Loading data --
@@ -117,8 +116,9 @@ switch(args[1],
            else
            {
                print("Plotter: plots FPKM vaules of one or more genes in all tissue considered")
-               Genes<-scan(args[2],what="character")
-               Plotter(Genes,transcripts)
+                                        #Genes<-scan(args[2],what="character")
+               Genes<-args[2]
+               p<-Plotter(Genes,transcripts)
            },
        "2"=if(length(args)<2)
            {
@@ -200,7 +200,7 @@ switch(args[1],
                Gene_Module<-SearchTranscriptGroup(args[2],args[3],transcripts)
                print(Gene_Module)
            },
-       "7"=if(length(args)<5)
+       "7"=if(length(args)<6)
            {
                print("Create Network Graph")
                print("Argument 2: Query transcript/gene")
@@ -212,12 +212,12 @@ switch(args[1],
                stop("Insufficient Arguments")
            }else
            {
-               print("Search coexpression group")
+               print("Create Nerwork Graph")
                ##Name: gene name to be analyzed
                ##ModulesFile: file containig informations about coexpression
                ##modules (TOM files from WGCNA pipeline)
-	       Net<-Network(args[2],args[3],data.fil,args[4],args[5])    
+               Network(args[2],args[3],args[4],transcripts,args[5],args[6])
            },
-	   PrintHelp()	
+       PrintHelp()
        
 )
