@@ -170,3 +170,8 @@ if sys.argv[1]=="6":
     out_file=open("SearchModule.tsv","w",5000000)
     out_file.write(str(Module))
     out_file.close
+
+if sys.argv[1]=="7":
+    Network=robjects.r('Network')
+    NET=Network(str(sys.argv[2]),str(sys.argv[3]),str(sys.argv[4]),transcripts,str(sys.argv[5]),str(sys.argv[6]))
+    rprint(NET)
