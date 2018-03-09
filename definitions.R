@@ -280,6 +280,10 @@ SearchByDiffFoldExpr<-function(Tissue1,Tissue2,Name,Transcripts)
 Plotter<-function(Genes,Transcripts)
     ##from a vector of genes creates a table and a histogram
 {
+                                        #lapply(Genes,toupper())
+    Genes<-toupper(Genes)
+    print(Genes)
+    
     Transcripts_FPKM<-Transcripts[,grep("FPKM",colnames(Transcripts))]
     Transcripts_FPKM$gene_name<-Transcripts$gene_name
     subsetted=NULL
@@ -401,7 +405,9 @@ SearchTranscriptGroup<-function(query_type,Name,ModulesFile,Transcripts)
 
 Network<-function(query_type,query,MODULES,Transcripts,corr,results)
 {
-
+    ##file hash for output
+    File_Hash<-paste(format(Sys.time(), "%Y%m%d%H%M"),"png",sep=".")
+    
     ## == Sanity checks ==
     if(query_type!="gene_name" & query_type!="symbol")
     {
@@ -431,7 +437,6 @@ Network<-function(query_type,query,MODULES,Transcripts,corr,results)
     ## == End of Defaults ==
 
     ## importing transcripts data
-    ##transcripts<-data.fil@expr$trans
     
     ##== The query is the gene symbol or gene name? ==
     
@@ -490,17 +495,19 @@ Network<-function(query_type,query,MODULES,Transcripts,corr,results)
 
         
         V(graph)$color<-"white"
-        V(graph)[query]$color<-"red"        
+        V(graph)[query]$color<-"red"
+
+        out_file=paste("Network",query,File_Hash,sep="_")
         ##plotting
-        
-        png("Auto.png",width=1080,heigh=720)
-        plot(graph,vertex.shape="vrectangle")
+        png(out_file,width=1080,heigh=720)
+        plot(graph)
+                                        #plot(graph,vertex.shape="vrectangle")
         dev.off()
     }
-
+    
     if(query_type=="gene_name")
     {
-    
+
         graph<-graph_from_adjacency_matrix(D,mode="max",weighted=TRUE,diag=FALSE)
             
         V(graph)$gene=as.character(transcripts[match(C,transcripts$gene_id),]$gene_name)
@@ -513,11 +520,11 @@ Network<-function(query_type,query,MODULES,Transcripts,corr,results)
         V(graph)$shape<-"vrectangle"
         graph<-simplify(graph)
 
-        
         ##plotting
 
+        out_file=paste("Network",query,File_Hash,sep="_")
         
-        png("Auto.png",width=1080,heigh=720)
+        png(out_file,width=1080,heigh=720)
         
         plot(graph, vertex.shape="vrectangle", vertex.label.color=my_color,label.degree="-p/2")
         
@@ -530,7 +537,6 @@ Network<-function(query_type,query,MODULES,Transcripts,corr,results)
         }else{
             cols=2
         }
-
         legend(x=-2,y=0.8,legend=levels(as.factor(V(graph)$gene)),
                col = coul ,
                bty = "n",
@@ -541,6 +547,7 @@ Network<-function(query_type,query,MODULES,Transcripts,corr,results)
                horiz = FALSE,
                ncol=cols,
                inset = c(0.1, 0.1))
+        dev.off()
     }    
     return(graph)
 }

@@ -16,11 +16,28 @@ igraph=rpackages.importr("igraph")
 grdevices=rpackages.importr('grDevices')
 #R print function
 rprint = robjects.globalenv.get("print")
-
+rplot = robjects.globalenv.get("plot")
+rlegend = robjects.globalenv.get("legend")
 grid.activate()
 
 # !!! Import options??? !!!
 #==== PREAMBLE ENDS ====
+
+#==== USEFULL FUNCTIONS ====
+
+def exp_spacer_up():
+    """
+    To highlight a wrong called function (head)
+    """
+    print("\n=====vvvvvvvvvv=====")
+
+def exp_spacer_down():
+    """
+    To highlight a wrong called function (bottom)
+    """
+    print("=====^^^^^^^^^^=====\n")
+#==== END =====
+
 
 #---- Importing functions ----
 definitions=base.source("definitions.R")
@@ -120,19 +137,38 @@ time=now.strftime("%Y%m%d%H%M")
 
 
 if str(sys.argv[1])=="1":
+    print("\n Function: Plotter")
     if len(sys.argv)==3:
         Plotter=robjects.r('Plotter')
         Plot=Plotter(sys.argv[2],transcripts)
-        rprint(Plot)
+        
+    else:
+        print("\n ATTENTION: Parsing Arguments Error")
+        exp_spacer_up()
+        print("Argument 1: gene symbol of gene you want to analyze or file containing the gene names to be analyzed (sep='\\n')")
+        exp_spacer_down()
+        sys.exit("Exiting")
+
+    out_name="Plotter_"+sys.argv[2]+"_"+time+".png"
+    grdevices.png(file=out_name, width=1080, height=720)
+    rprint(Plot)
+    grdevices.dev_off()
         
 if sys.argv[1]=="2":
+    print("\n Function: SearchByTissue")
     if len(sys.argv)==4:
         SearchByTissue=robjects.r('SearchByTissue')
         Tissue=SearchByTissue(str(sys.argv[2]),str(sys.argv[3]),transcripts)
-    else:
+    elif len(sys.argv)==3: 
         SearchByTissue=robjects.r('SearchByTissue')
         Tissue=SearchByTissue(str(sys.argv[2]),"",transcripts)
-
+    else:
+        print("\n ATTENTION: Parsing Arguments Error")
+        exp_spacer_up()
+        print("Argument 2: tissue name to be analyzed")
+        print("Argument 3: (optional): gene symbol of gene to be analyzed")
+        exp_spacer_down()
+        sys.exit("Exiting")
 
     out_name="SearchTissue_"+sys.argv[2]+"_"+time+".tsv"
     out_file=open(out_name,"w",5000000)
@@ -140,8 +176,16 @@ if sys.argv[1]=="2":
     out_file.close
         
 if sys.argv[1]=="3":
-    SearchByGene=robjects.r('SearchByGene')
-    Gene=SearchByGene(str(sys.argv[2]),transcripts)
+    print("\n Function: SearchByGene")
+    if len(sys.argv)==3:
+        SearchByGene=robjects.r('SearchByGene')
+        Gene=SearchByGene(str(sys.argv[2]),transcripts)
+    else:
+        print("\n ATTENTION: Parsing Arguments Error")
+        exp_spacer_up()
+        print("Argument 2: gene symbol to be analyzed")
+        exp_spacer_down()
+        sys.exit("Exiting")
 
     out_name="SearchGene_"+sys.argv[2]+"_"+time+".tsv"
     out_file=open(out_name,"w",5000000)
@@ -149,40 +193,83 @@ if sys.argv[1]=="3":
     out_file.close
 
 if sys.argv[1]=="4":
+    print("\n Function: SearchByFeature")
     SearchByFeature=robjects.r('SearchByFeature')
     data_fil=robjects.r('data.fil')
     if len(sys.argv)==4:
         Feature=SearchByFeature(str(sys.argv[2]),str(sys.argv[3]),data_fil,phenodata)
-    else:
+    elif len(sys.argv)==3:
         Feature=SearchByFeature(str(sys.argv[2]),'',data_fil,phenodata)
-
+    else:
+        print("\n ATTENTION: Parsing Arguments Error")
+        exp_spacer_up()
+        print("Argument 1: Gene symbol to be analyzed")
+        print("Argument 2 (Optional): Gene feature to be analyzed (exon or intron)")
+        exp_spacer_down()
+        sys.exit("Exiting")
+        
     out_name="SearchFeature_"+sys.argv[2]+"_"+sys.argv[3]+"_"+time+".tsv"
     out_file=open(out_name,"w",5000000)
     out_file.write(str(Feature))
     out_file.close
 
 if sys.argv[1]=="5":
+    print("\n Function: SearchByDiffFoldExpr")
     SearchByDiffFoldExpr=robjects.r('SearchByDiffFoldExpr')
     if len(sys.argv)==5:
         Fold=SearchByDiffFoldExpr(str(sys.argv[2]),str(sys.argv[3]),str(sys.argv[4]),transcripts)
-    else:
+    elif len(sys.argv)==4:
         Fold=SearchByDiffFoldExpr(str(sys.argv[2]),str(sys.argv[3]),"",transcripts)
-
+    else:
+        print("\n ATTENTION: Parsing Arguments Error")
+        exp_spacer_up()
+        print("Argument 1: First Tissue to be analyzed")
+        print("Argument 2: Second Tissue to be analyzed")
+        print("Argument 3 (optional): a particular gene to be analyzed (gene symbol)")
+        exp_spacer_down()
+        sys.exit("Exiting")
+        
     out_name="SearchFold_"+sys.argv[2]+"_"+sys.argv[3]+"_"+time+".tsv"
     out_file=open(out_name,"w",5000000)
     out_file.write(str(Fold))
     out_file.close
 
 if sys.argv[1]=="6":
-    SearchTranscriptGroup=robjects.r('SearchTranscriptGroup')
-    Module=SearchTranscriptGroup(str(sys.argv[2]),str(sys.argv[3]),str(sys.argv[4]),transcripts)
-
+    print("\n Function: SearchTranscritpGroup")
+    if len(sys.argv)==5:
+        SearchTranscriptGroup=robjects.r('SearchTranscriptGroup')
+        Module=SearchTranscriptGroup(str(sys.argv[2]),str(sys.argv[3]),str(sys.argv[4]),transcripts)
+    else:
+        print("\n ATTENTION: Parsing Arguments Error")
+        exp_spacer_up()
+        print("Argument 1: ")
+        print("Argument 2: Gene name (eg 'gene77') or gene symbol (eg 'STK33') to be analyzed")
+        print("Argument 3: File containing informations about coexpression (gene modules)")
+        print("Argument 4: TOM files from WGCNA pipeline")
+        exp_spacer_down()
+        sys.exit("Exiting")
+        
     out_name="SearchExpressionModule_"+sys.argv[2]+"_"+time+".tsv"
     out_file=open(out_name,"w",5000000)
     out_file.write(str(Module))
     out_file.close
 
 if sys.argv[1]=="7":
-    Network=robjects.r('Network')
-    NET=Network(str(sys.argv[2]),str(sys.argv[3]),str(sys.argv[4]),transcripts,str(sys.argv[5]),str(sys.argv[6]))
-    rprint(NET)
+    print("\n Function: Network")
+    if len(sys.argv)==7:
+        Network=robjects.r('Network')
+        NET=Network(str(sys.argv[2]),str(sys.argv[3]),str(sys.argv[4]),transcripts,str(sys.argv[5]),str(sys.argv[6]))
+        rplot(NET)
+    else:
+        print("\n ATTENTION: Parsing Arguments Error")
+        exp_spacer_up()
+        print("Argument 1: gene name or gene symbol is used? Possible values: symbol or gene_name")
+        print("Argument 2: Gene name (eg 'gene77') or gene symbol (eg 'STK33') to be analyzed")
+        print("Argument 3: File containing informations about coexpression (gene modules)")
+        print("""Argument 4: correlation threashold value to show a connection.
+NB: this value is considered ad absolute value: both positive and negative connections are considered""")
+        print("Argument 5: number of genes (nodes) to be mantained")
+        exp_spacer_down()
+        sys.exit("Exiting")
+
+
