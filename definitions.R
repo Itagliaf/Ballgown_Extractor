@@ -587,5 +587,6 @@ GeneFoldTissue<-function(Name,Transcripts)
     FC$gene_name<-GENE_FPKM$gene_name
     FC$t_name<-GENE_FPKM$t_name	
 
+    names_ok<-gsub("FPKM.","",colnames(FC))
     return(FC)
 }
