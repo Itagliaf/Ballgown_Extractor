@@ -1,7 +1,7 @@
 ##---- Preamble: Importing Libraries----
 library(ggplot2)
 library(Cairo)
-library(igraph)
+##library(igraph)
 
 #antialiasing
 options(shiny.usecairo=T)
@@ -218,6 +218,16 @@ switch(args[1],
                ##modules (TOM files from WGCNA pipeline)
                Network(args[2],args[3],args[4],transcripts,args[5],args[6])
            },
-       PrintHelp()
-       
+       "8"=if(length(args)<2)
+           {
+		print("Differential fold of a gene in all tissues")
+		print("Argument2: Query name (gene symbol)")
+	   }else{
+		print("Differential fold of a gene in all tissues")
+		GeneFoldTissue<-GeneFoldTissue(args[2],transcripts)
+
+		out_file=paste("GeneFold",args[2],File_Hash,sep="_")	
+                write.table(GeneFoldTissue, out_file,row.names=FALSE,col.names=TRUE)	
+	   },
+       	   PrintHelp()
 )

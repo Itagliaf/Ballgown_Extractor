@@ -551,3 +551,41 @@ Network<-function(query_type,query,MODULES,Transcripts,corr,results)
     }    
     return(graph)
 }
+
+
+GeneFoldTissue<-function(Name,Transcripts)
+##subsets the dataframe to extract only 2 tissues and confront their expression (fold expression)
+{
+    print("Search By Differential of a gene")
+    Name<-toupper(Name)
+    print(Name)
+    
+    FPKM_ONLY<-transcripts[,grep("FPKM",colnames(transcripts))]    
+    FPKM_ONLY$gene_name<-transcripts$gene_name
+    FPKM_ONLY$t_name<-transcripts$t_name
+
+    #GENE_FPKM<-FPKM_ONLY[match(Name,FPKM_ONLY$gene_name),]
+    GENE_FPKM<-FPKM_ONLY[which(FPKM_ONLY$gene_name %in% Name),]
+    GN<-GENE_FPKM$gene_name
+    TN<-GENE_FPKM$t_name
+
+    ##GENE_FPKM<-GENE_FPKM[,c(1:length(colnames(GENE_FPKM))-2)]
+    GENE_FPKM<-GENE_FPKM[,c(1:30)]
+    
+    ##add a little value to avoid 0 on denominators	
+    GENE_FPKM<-GENE_FPKM+0.00001
+    GENE_FPKM$gene_name<-GN
+    GENE_FPKM$t_name<-TN
+
+    print(GENE_FPKM)
+    ## the median of the mean values of transcritption guarantee that
+    ## oviduct is a pretty "average" tissue
+    ref<-GENE_FPKM$FPKM.oviduct
+
+    ##fold change (logarithmic)
+    FC=log2(GENE_FPKM[,c(1:29)]/ref)		
+    FC$gene_name<-GENE_FPKM$gene_name
+    FC$t_name<-GENE_FPKM$t_name	
+
+    return(FC)
+}
