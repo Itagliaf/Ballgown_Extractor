@@ -485,7 +485,6 @@ Network<-function(query_type,query,MODULES,Transcripts,corr,results)
     D<-D/40
 
     print("Create graph")
-
     
     if(query_type=="symbol")
     {
@@ -499,10 +498,10 @@ Network<-function(query_type,query,MODULES,Transcripts,corr,results)
 
         out_file=paste("Network",query,File_Hash,sep="_")
         ##plotting
-        png(out_file,width=1080,heigh=720)
+        ## png(out_file,width=1080,heigh=720)
         plot(graph)
-                                        #plot(graph,vertex.shape="vrectangle")
-        dev.off()
+        ##                                 #plot(graph,vertex.shape="vrectangle")
+        ## dev.off()
     }
     
     if(query_type=="gene_name")
@@ -524,7 +523,7 @@ Network<-function(query_type,query,MODULES,Transcripts,corr,results)
 
         out_file=paste("Network",query,File_Hash,sep="_")
         
-        png(out_file,width=1080,heigh=720)
+        ##png(out_file,width=1080,heigh=720)
         
         plot(graph, vertex.shape="vrectangle", vertex.label.color=my_color,label.degree="-p/2")
         
@@ -547,8 +546,9 @@ Network<-function(query_type,query,MODULES,Transcripts,corr,results)
                horiz = FALSE,
                ncol=cols,
                inset = c(0.1, 0.1))
-        dev.off()
-    }    
+        ##dev.off()
+    }
+    
     return(graph)
 }
 
@@ -585,8 +585,10 @@ GeneFoldTissue<-function(Name,Transcripts)
     ##fold change (logarithmic)
     FC=log2(GENE_FPKM[,c(1:29)]/ref)		
     FC$gene_name<-GENE_FPKM$gene_name
-    FC$t_name<-GENE_FPKM$t_name	
-
+    FC$t_name<-GENE_FPKM$t_name
+    
     names_ok<-gsub("FPKM.","",colnames(FC))
+    colnames(FC)<-names_ok
+    
     return(FC)
 }
