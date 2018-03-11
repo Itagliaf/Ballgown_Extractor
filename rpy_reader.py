@@ -273,3 +273,14 @@ NB: this value is considered ad absolute value: both positive and negative conne
         sys.exit("Exiting")
 
 
+if sys.argv[1]=="8":
+    print("\n Function: Gene Fold Change Between Tissues")
+    if len(sys.argv)==3:
+        GeneFoldTissue=robjects.r("GeneFoldTissue")
+        GeneFold=GeneFoldTissue(argv[2],transcritps)
+    else:
+        print("\n ATTENTION: Parsing Arguments Error")
+        exp_spacer_up()
+        print("Argument 1: gene symbol (Eg stk33, abcd1) to be searched")
+        exp_spacer_down()
+        sys.exit("Exiting")
