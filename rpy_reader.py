@@ -136,23 +136,35 @@ now = datetime.datetime.now()
 time=now.strftime("%Y%m%d%H%M")
 
 
+# if str(sys.argv[1])=="1":
+#     print("\n Function: Plotter")
+#     if len(sys.argv)==3:
+#         Plotter=robjects.r('Plotter')
+#         Plot=Plotter(sys.argv[2],transcripts)
+        
+#     else:
+#         print("\n ATTENTION: Parsing Arguments Error")
+#         exp_spacer_up()
+#         print("Argument 1: gene symbol of gene you want to analyze or file containing the gene names to be analyzed (sep='\\n')")
+#         exp_spacer_down()
+#         sys.exit("Exiting")
+
+#     out_name="Plotter_"+sys.argv[2]+"_"+time+".png"
+#     grdevices.png(file=out_name, width=1080, height=720)
+#     rprint(Plot)
+#     grdevices.dev_off()
+    
 if str(sys.argv[1])=="1":
     print("\n Function: Plotter")
     if len(sys.argv)==3:
-        Plotter=robjects.r('Plotter')
-        Plot=Plotter(sys.argv[2],transcripts)
-        
+        Plotter=robjects.r('Plotter2')
+        Plot=Plotter2(sys.argv[2],transcripts)    
     else:
         print("\n ATTENTION: Parsing Arguments Error")
         exp_spacer_up()
         print("Argument 1: gene symbol of gene you want to analyze or file containing the gene names to be analyzed (sep='\\n')")
         exp_spacer_down()
         sys.exit("Exiting")
-
-    out_name="Plotter_"+sys.argv[2]+"_"+time+".png"
-    grdevices.png(file=out_name, width=1080, height=720)
-    rprint(Plot)
-    grdevices.dev_off()
         
 if sys.argv[1]=="2":
     print("\n Function: SearchByTissue")

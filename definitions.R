@@ -1,3 +1,101 @@
+library(ballgown)	
+## Plotter<-function(Genes,Transcripts)
+##     ##from a vector of genes creates a table and a histogram
+## {
+##                                         #lapply(Genes,toupper())
+##     Genes<-toupper(Genes)
+##     print(Genes)
+    
+##     Transcripts_FPKM<-Transcripts[,grep("FPKM",colnames(Transcripts))]
+##     Transcripts_FPKM$gene_name<-Transcripts$gene_name
+##     subsetted=NULL
+    
+##     for (gene in Genes)
+##     {
+##         temp<-subset(Transcripts_FPKM,Transcripts_FPKM$gene_name==gene)
+##         subsetted<-rbind(subsetted,temp)	
+##     }
+##     subsetted_ok=NULL
+
+##     for (gene in Genes)
+##     {
+##         if (length(grep(gene,subsetted$gene_name)>1))
+##         {
+##             multiple<-subsetted[grep(gene,subsetted$gene_name,),]
+##             mean_vec<-apply(multiple[,-ncol(multiple)],2,mean)
+##             ##mean_vec$gene_nane
+##             ##mean_vec
+##             subsetted_ok<-rbind(subsetted_ok,mean_vec)
+##         }
+##         else
+##         {
+##             subsetted_ok<-rbind(subsetted_ok,subsetted[grep(gene,subsetted$gene_name,),-ncol(subsetted)])
+##         }
+##     }
+##     subsetted<-subsetted_ok
+##     ##subsetted$gene_name<-Genes
+##     row.names(subsetted)<-Genes
+##     colnames(subsetted)<-gsub("FPKM.","",colnames(subsetted))
+##     colnames(subsetted)<-gsub("\\."," ",colnames(subsetted))
+
+##     if (length(Genes)==1)
+##     {
+##         print("subsetted is ok")
+##     }
+##     else
+##     {
+##         subsetted<-subsetted[,-ncol(subsetted)]
+##         subsetted<-as.data.frame(subsetted)
+##     }
+##     tsubsetted<-t(subsetted)
+
+##     row.names(tsubsetted)<-colnames(subsetted)
+
+##     tsubsetted<-as.data.frame(tsubsetted)
+##     tsubsetted$tissue<-row.names(tsubsetted)
+    
+##     for (gene in Genes)
+##     {
+##         out_file <- paste(gene,"png",sep=".")
+##         ylab_ok <- paste(gene,"(FPKM)",sep=" ")
+        
+##         #print(tsubsetted)
+##         if (length(Genes)==1)
+##         {
+##             df2<-tsubsetted
+##         }
+##         else
+##         {
+##             df2 <- tsubsetted[,c(gene, "tissue")]
+##         }
+##         print(gene)
+##         p<-ggplot(data=df2)+
+##             geom_bar(stat="identity",aes_string(x="tissue",y=gene,fill="tissue"))+
+##             theme_minimal()+
+##             labs(x="TISSUE",y=ylab_ok)+
+##             theme(axis.text.x=element_text(angle=75,vjust=0.5,size=15))+
+##             theme(axis.title.x=element_text(size=15))+
+##             theme(axis.text.y=element_text(size=15))+
+##             theme(axis.title.y=element_text(size=15))+
+##             theme(legend.position="none")
+        
+##     }
+##     return(p)
+## }
+Plotter2<-function(gene,Data.Fil)
+{
+    ##plots all transcripts realtive to a single gene relatively to all tissues
+	
+    gene_row<-match(gene,ballgown::geneNames(data.fil))
+    gn<-ballgown::geneIDs(data.fil)[gene_row]
+    out_file <- paste(gene,"png",sep=".")
+	png(out_file)
+    P<-plotTranscripts(gn,data.fil,sample=phenodata$ids)
+    dev.off()
+    ##return(P)
+    return(0)
+}
+
 NameFormatter<-function(Transcripts,phenodata)
     ##formats in a better way the names of the columns
 
@@ -50,6 +148,9 @@ PrintHelp<-function()
     print ("3 = Search by gene")
     print ("4 = Search by gene feature")
     print ("5 = Search by Differential Fold")
+    print ("6 = Search Coexpression Module")
+    print ("7 = Create Network graph")
+    print ("8 = Differenctial fold for a gene in all tissues")
     print ("99 = import data from a ballgonw object")
     stop("No arguments given")
 }
@@ -277,89 +378,6 @@ SearchByDiffFoldExpr<-function(Tissue1,Tissue2,Name,Transcripts)
     return(LittleData)
 }
 
-Plotter<-function(Genes,Transcripts)
-    ##from a vector of genes creates a table and a histogram
-{
-                                        #lapply(Genes,toupper())
-    Genes<-toupper(Genes)
-    print(Genes)
-    
-    Transcripts_FPKM<-Transcripts[,grep("FPKM",colnames(Transcripts))]
-    Transcripts_FPKM$gene_name<-Transcripts$gene_name
-    subsetted=NULL
-    
-    for (gene in Genes)
-    {
-        temp<-subset(Transcripts_FPKM,Transcripts_FPKM$gene_name==gene)
-        subsetted<-rbind(subsetted,temp)	
-    }
-    subsetted_ok=NULL
-
-    for (gene in Genes)
-    {
-        if (length(grep(gene,subsetted$gene_name)>1))
-        {
-            multiple<-subsetted[grep(gene,subsetted$gene_name,),]
-            mean_vec<-apply(multiple[,-ncol(multiple)],2,mean)
-            ##mean_vec$gene_nane
-            ##mean_vec
-            subsetted_ok<-rbind(subsetted_ok,mean_vec)
-        }
-        else
-        {
-            subsetted_ok<-rbind(subsetted_ok,subsetted[grep(gene,subsetted$gene_name,),-ncol(subsetted)])
-        }
-    }
-    subsetted<-subsetted_ok
-    ##subsetted$gene_name<-Genes
-    row.names(subsetted)<-Genes
-    colnames(subsetted)<-gsub("FPKM.","",colnames(subsetted))
-    colnames(subsetted)<-gsub("\\."," ",colnames(subsetted))
-
-    if (length(Genes)==1)
-    {
-        print("subsetted is ok")
-    }
-    else
-    {
-        subsetted<-subsetted[,-ncol(subsetted)]
-        subsetted<-as.data.frame(subsetted)
-    }
-    tsubsetted<-t(subsetted)
-
-    row.names(tsubsetted)<-colnames(subsetted)
-
-    tsubsetted<-as.data.frame(tsubsetted)
-    tsubsetted$tissue<-row.names(tsubsetted)
-    
-    for (gene in Genes)
-    {
-        out_file <- paste(gene,"png",sep=".")
-        ylab_ok <- paste(gene,"(FPKM)",sep=" ")
-        
-        #print(tsubsetted)
-        if (length(Genes)==1)
-        {
-            df2<-tsubsetted
-        }
-        else
-        {
-            df2 <- tsubsetted[,c(gene, "tissue")]
-        }
-        print(gene)
-        p<-ggplot(data=df2)+
-            geom_bar(stat="identity",aes_string(x="tissue",y=gene,fill="tissue"))+
-            theme_minimal()+
-            labs(x="TISSUE",y=ylab_ok)+
-            theme(axis.text.x=element_text(angle=75,vjust=0.5,size=15))+
-            theme(axis.title.x=element_text(size=15))+
-            theme(axis.text.y=element_text(size=15))+
-            theme(axis.title.y=element_text(size=15))+
-            theme(legend.position="none")
-        
-    }
-    return(p)
-}
 
 SearchTranscriptGroup<-function(query_type,Name,ModulesFile,Transcripts)
 {
