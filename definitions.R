@@ -564,7 +564,6 @@ GeneFoldTissue<-function(Name,Transcripts)
     FPKM_ONLY$gene_name<-transcripts$gene_name
     FPKM_ONLY$t_name<-transcripts$t_name
 
-    #GENE_FPKM<-FPKM_ONLY[match(Name,FPKM_ONLY$gene_name),]
     GENE_FPKM<-FPKM_ONLY[which(FPKM_ONLY$gene_name %in% Name),]
     GN<-GENE_FPKM$gene_name
     TN<-GENE_FPKM$t_name
@@ -577,7 +576,6 @@ GeneFoldTissue<-function(Name,Transcripts)
     GENE_FPKM$gene_name<-GN
     GENE_FPKM$t_name<-TN
 
-    print(GENE_FPKM)
     ## the median of the mean values of transcritption guarantee that
     ## oviduct is a pretty "average" tissue
     ref<-GENE_FPKM$FPKM.oviduct
@@ -590,5 +588,12 @@ GeneFoldTissue<-function(Name,Transcripts)
     names_ok<-gsub("FPKM.","",colnames(FC))
     colnames(FC)<-names_ok
     
+    FC_COL<-c(length(colnames(FC))-1,length(colnames(FC)))
+    FOLD_COLS<-length(colnames(FC))-2
+    FC_COL<-c(FC_COL,c(1:FOLD_COLS))
+    
+    FC<-FC[,FC_COL]
+
+    print(FC)
     return(FC)
 }

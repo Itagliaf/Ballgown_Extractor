@@ -256,7 +256,7 @@ ui <- fluidPage( #Begins a flui page (change when windows dimensions change)
                 column
                 (
                     width=12,
-                    dataTableOutput(outputId="GFA")
+                    tableOutput(outputId="GFA")
                 )
             )
         )
