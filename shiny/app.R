@@ -159,14 +159,21 @@ ui <- fluidPage( #Begins a flui page (change when windows dimensions change)
             )
         ),
         tabPanel(
-            "Search Transcriptiona Module",
+            "Search Transcriptional Module",
             sidebarLayout(
                 sidebarPanel(
+                    selectInput
+                    (
+                        inputId="gene_id_module",
+                        label="Gene name or gene symbol available?",
+                        choices=c("symbol","gene_name"),
+                        selected="symbol"
+                    ),
                     textInput
                     (
                         inputId="gene_module",
                         label="Gene you want to analyze",
-                        value="gene1"
+                        value="stk33"
                     ),
                     actionButton
                     (
@@ -307,8 +314,10 @@ server <- function(input, output) {
 
     output$MO<-renderTable({
         input$search_module
+        ID_M<-isolate(input$gene_id_module)
         GENE<-isolate(input$gene_module)
-        SearchTranscriptGroup(GENE,"OK_Gene_Modules.Rdata","Little_1000_TOM-block.1.RData")
+        ##SearchTranscriptGroup(ID_M,GENE,"Gene_Modules.Rdata","TOM_Complete-block.1.RData")
+        SearchTranscriptGroup(ID_M,GENE,"Gene_Modules.Rdata",transcripts)
     })
 
     output$NT<-renderPlot({
@@ -318,7 +327,7 @@ server <- function(input, output) {
         COR<-isolate(input$correlation_network)
         NUM<-isolate(input$number_network)
 	
-        Network(ID,TRAN,"OK_Gene_Modules.Rdata",data.fil,COR,NUM)        
+        Network(ID,TRAN,"Gene_Modules.Rdata",data.fil,COR,NUM)        
     })
 
     output$GFA<-renderTable({

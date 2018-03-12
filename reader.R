@@ -1,7 +1,7 @@
 ##---- Preamble: Importing Libraries----
 library(ggplot2)
 library(Cairo)
-##library(igraph)
+library(igraph)
 
 #antialiasing
 options(shiny.usecairo=T)
@@ -196,8 +196,7 @@ switch(args[1],
                print("Search coexpression group")
                ##Name: gene name to be analyzed
                ##ModulesFile: file containig informations about coexpression
-               ##modules (TOM files from WGCNA pipeline)
-               Gene_Module<-SearchTranscriptGroup(args[2],args[3],transcripts)
+               Gene_Module<-SearchTranscriptGroup(args[2],args[3],args[4],transcripts)
                print(Gene_Module)
            },
        "7"=if(length(args)<6)

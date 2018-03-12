@@ -373,7 +373,7 @@ SearchTranscriptGroup<-function(query_type,Name,ModulesFile,Transcripts)
     {
         #all gene symbols are upper cases
         Name<-toupper(Name)
-        
+
         colnames(datExpr)<-as.character(Transcripts[match(colnames(datExpr),transcripts$gene_id),]$gene_name)
         pos<-match(Name,colnames(datExpr))
     }
