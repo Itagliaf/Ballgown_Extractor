@@ -52,26 +52,64 @@ The following python packages are required:
 
 - [rpy2](https://pypi.python.org/pypi/rpy2)
 
+All the dependecies are installed automatically by the script install_deps.sh
+
+
 # Usage
 
-This tool must be run from the command line using Rscript.
+## Command line
+The "Launching scripts" must bu run from command line as follows
 
-```bash
+'''
 Rscript reader.R [arguments]
-```
+python3 rpy_reader.py [arguments]
+'''
+
 To show a synthetic help, run the above command without any argument.
 
-To access the function, one should use the first positional argument as follows:
+The arguments are a numerical code that identifies a single function and
+their arguments.
 
-- 1 "Plotter": plots the FPKM values of one or more genes considered.
+The numeric code list to invoke the functions is reported below:
+
+"Choose a function as follow:"
+
+- 1 = Plotter Function
+
+- 2 = Search by Tissue
+
+- 3 = Search by Gene
+
+- 4 = Search by gene feature
+
+- 5 = Search by Differential Fold
+
+- 6 = Search Coexpression Module
+
+- 7 = Create Network Graph
+
+- 8 = Differential Fold for a Gene in All Tissues
+
+- 99 = Import Data From a Ballgonw Object
+
+## Shiny app:
+
+After running "App.R", a new browser window will open. All the funcions 
+reported here are present as tabs inside the app.
+
+# Functions
+
+- 1 "Plotter": plots the FPKM values of all transcripts of a given gene
 Arguments:
-  - file containing a list of genes (separator=\n)
+  - gene symbol wanted
 
 ```bash
-Rscript reader.R 1 input_genes.txt
+Rscript reader.R 1 GENE1
 ```
 
-- 2 "SearchByTissue": Searches a tissue and write  a file containing the FPKM values of all genes. If a third argument with the name of gene is given, the FPKM of this gene inside the chosen tissue. Arguments
+- 2 "SearchByTissue": Searches a tissue and write a file containing the FPKM values of all genes.
+If a second argument with the name of gene is given, the FPKM of this gene inside the chosen tissue.
+Arguments:
 
   - tissue name;
   - gene name (optional);
@@ -80,10 +118,11 @@ Rscript reader.R 1 input_genes.txt
 #FPKM of all genes inside the tissue "liver"
 Rscript reader.R 2 liver
 #FPKM of the gene "gene1" in the tissue "liver"
-Rscript reader.R 2 liver gene1
+Rscript reader.R 2 liver GENE1
 ```
 
-- 3 "SearchByGene": Searches the FPKM values of a single gene in all tissues. Arguments
+- 3 "SearchByGene": Searches the FPKM values of a single gene in all tissues.
+Arguments:
   - Gene name to be analyzed
 
 ```bash
