@@ -12,19 +12,45 @@ described by Petrea and collegues. This pipeline takes advantage of
 In particular, these scripts will allow you to extract information
 about single genes, tissues and gene features.
 
+The algorithmic part is contained in "definitons.R" script. This script 
+can be run in 3 different ways:
+
+- 1 using reader.R: running reader.R as script with the appropriate arguments
+```
+Rscript reader.R <function_code> [arguments]
+```
+
+- 2 using rpy_reader.py: this python scrypts uses [rpy2](https://pypi.python.org/pypi/rpy2)
+to run the functions defined in definitions.R 
+
+```
+python3 rpy_reader.py <function_code> [aruments]
+```
+
+
+- 3 using App.R: this R scipt scrypts uses [shiny](https://www.rstudio.com/products/shiny/)
+and opens a local shiny app.
+
+```
+Rscript App.R
+```
+
 # Dependencies
 
-This script is written in [R](https://www.r-project.org/). It was
-tested using the version 3.4.1 "Single Candle" but all distribution
-supporting the packages required should be fine.
+This script is written in [R](https://www.r-project.org/) and [pyhton 3](https://www.python.org/downloads/release/python-363/).
+It wastested using the R version 3.4.1 "Single Candle" and the python 3.5.2.
 
-
-The following packages are needed:
+The following R packages are required:
 
 - [ballgown](http://bioconductor.org/packages/release/bioc/html/ballgown.html)
 - [dplyr](https://cran.r-project.org/web/packages/dplyr/README.html)
 - [genefilter](http://bioconductor.org/packages/release/bioc/html/genefilter.html)
 - [ggplot2](http://ggplot2.org/)
+- [igraph](http://igraph.org/r/)
+
+The following python packages are required:
+
+- [rpy2](https://pypi.python.org/pypi/rpy2)
 
 # Usage
 
