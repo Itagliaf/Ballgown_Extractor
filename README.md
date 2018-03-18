@@ -60,10 +60,11 @@ All the dependecies are installed automatically by the script install_deps.sh
 ## Command line
 The "Launching scripts" must bu run from command line as follows
 
-'''
+```
 Rscript reader.R [arguments]
+
 python3 rpy_reader.py [arguments]
-'''
+```
 
 To show a synthetic help, run the above command without any argument.
 
@@ -126,29 +127,65 @@ Arguments:
   - Gene name to be analyzed
 
 ```bash
-Rscript reader.R 3 gene1
+Rscript reader.R 3 GENE1
 ```
 
 - 4 "SearchByGeneFeature": allows to analyze the expression of gene features such as introns or exons. Arguments:
-  - Gene name to be analyzed
+  - Gene symbol to be analyzed
   - Gene feature to be analyzed (Exon or Intron)
 
 ```bash
-#results about the exons of gene1
-Rscript reader.R 4 gene1 exon
-#results about the introns of gene1
-Rscript reader.R 4 gene1 intron
+#results about the exons of GENE1
+Rscript reader.R 4 GENE1 exon
+#results about the introns of GENE1
+Rscript reader.R 4 GENE1 intron
 ```
 
 - 5 "SearchByDifferentialFold": Given 2 tissues, the differential fold (linear and log2) is calculated. To avoid "Inf" values, to all FPKM values was added 0.000001.
 If a fourth argument is given reporting a gene name, the function will consider only the entries containing only that gene. Arguments
   - First tissue to be considered;
   - Second tissue to be considered;
-  - Gene name (optional);
+  - Gene Symbol (optional);
 
 ```bash
 #Differential fold between liver and muscle
 Rscript reader.R 5 liver muscle
 #Differential fold between liver and muscle considering only the gene "gene1"
-Rscript reader.R 5 liver muscle gene1
+Rscript reader.R 5 liver muscle GENE1
+```
+
+- 6 "SearchCoexpressionModule": Given a gene symbol, the coexpression module, found with [WGCNA](https://labs.genetics.ucla.edu/horvath/CoexpressionNetwork/Rpackages/WGCNA/)
+is returned.
+Arguments:
+
+  - Gene Symbol;
+  - File containing the coexpression module found with WGCNA;
+  
+```bash
+Rscript reader.R 6 GENE1 Module_File
+```
+
+- 7 "Network": Given a gene symbol, from the coexpression module, found with [WGCNA](https://labs.genetics.ucla.edu/horvath/CoexpressionNetwork/Rpackages/WGCNA/)
+a network graph containing only n nodes (genes) over a certain correlation value is produced
+Arguments:
+
+  - Gene Name or Symbol is used to identify the gene. This option will be deleted in a future version, just use "symbol";
+  - Gene Symbol;
+  - File containing the coexpression module found with WGCNA;
+  - Correlation threashold value to show a connection between 2 genes
+  - Number of nodes-genes to be shown
+  
+```bash
+Rscript reader.R 7 symbol GENE1 Module_File 0.8 25
+```
+
+
+- 8 "Differential Fold for a Gene in All Tissues": Given a gene symbol, the differential fold between all genes is calculated considering
+the oviduct as a refernce.
+NB: up to now "oviduct" is hardcoded, this issue will be resolved soon
+
+  - Gene Symbol;
+  
+```bash
+Rscript reader.R 8 GENE1
 ```
