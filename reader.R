@@ -2,7 +2,7 @@
 library(ggplot2)
 library(Cairo)
 library(igraph)
-libraru
+
 #antialiasing
 options(shiny.usecairo=T)
 ##---------------------------------------
@@ -14,7 +14,6 @@ source("definitions.R")
 ##---- Begin execution ----
 #Feeding arguments to the script
 args <- commandArgs(TRUE)
-
 
 ##-- Importing files --
 #Sanity check: there are arguments?
@@ -65,7 +64,7 @@ if (args[1]==99 && length(args)<4)
     save(data.fil,file="data.fil.RData")
 
     print("Your data are stored in data.fil.RData")
-    stop("All done: exiting")
+    print("All done: exiting")
 }
 
 ## -- Loading data --
@@ -117,8 +116,10 @@ switch(args[1],
            else
            {
                print("Plotter: plots FPKM vaules of one or more genes in all tissue considered")
-               Genes<-scan(args[2],what="character")
-               Plotter(Genes,transcripts)
+                                        #Genes<-scan(args[2],what="character")
+               Genes<-args[2]
+               #p<-Plotter(Genes,transcripts)
+	       Plotter2(Genes,data.fil)
            },
        "2"=if(length(args)<2)
            {
@@ -196,11 +197,10 @@ switch(args[1],
                print("Search coexpression group")
                ##Name: gene name to be analyzed
                ##ModulesFile: file containig informations about coexpression
-               ##modules (TOM files from WGCNA pipeline)
-               Gene_Module<-SearchTranscriptGroup(args[2],args[3],transcripts)
+               Gene_Module<-SearchTranscriptGroup(args[2],args[3],args[4],transcripts)
                print(Gene_Module)
            },
-       "7"=if(length(args)<5)
+       "7"=if(length(args)<6)
            {
                print("Create Network Graph")
                print("Argument 2: Query transcript/gene")
@@ -212,13 +212,36 @@ switch(args[1],
                stop("Insufficient Arguments")
            }else
            {
-               print("Search coexpression group")
+               print("Create Nerwork Graph")
                ##Name: gene name to be analyzed
                ##ModulesFile: file containig informations about coexpression
                ##modules (TOM files from WGCNA pipeline)
-               Gene <- Module<-SearchTranscriptGroup(args[2],args[3],transcripts)
-               print(Gene <- Module)
-                          },
-       PrintHelp()
-       
-)
+               Network(args[2],args[3],args[4],transcripts,args[5],args[6])
+           },
+       "8"=if(length(args)<2)
+           {
+		print("Differential fold of a gene in all tissues")
+		print("Argument2: Query name (gene symbol)")
+	   }else
+	   {
+		print("Differential fold of a gene in all tissues")
+		GeneFoldTissue<-GeneFoldTissue(args[2],transcripts)
+
+		out_file=paste("GeneFold",args[2],File_Hash,sep="_")	
+                write.table(GeneFoldTissue, out_file,row.names=FALSE,col.names=TRUE)	
+	   },
+       "15"=if(length(args)<2)
+           {
+              print("Plotter: plots FPKM vaules of one or more genes in all tissue considered")
+              print("Argument 2: File containig the genes names to be analyzed (sep=\n)")
+              print("Exiting")
+              stop("Insufficient Arguments")
+           }else{
+           
+               print("Plotter: plots FPKM vaules of one or more genes in all tissue considered")
+                                        #Genes<-scan(args[2],what="character")
+               Genes<-args[2]
+               p<-Plotter2(Genes,data.fil)
+           },
+    PrintHelp()
+)	   

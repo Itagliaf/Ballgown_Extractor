@@ -159,14 +159,21 @@ ui <- fluidPage( #Begins a flui page (change when windows dimensions change)
             )
         ),
         tabPanel(
-            "Search Transcriptiona Module",
+            "Search Transcriptional Module",
             sidebarLayout(
                 sidebarPanel(
+                    selectInput
+                    (
+                        inputId="gene_id_module",
+                        label="Gene name or gene symbol available?",
+                        choices=c("symbol","gene_name"),
+                        selected="symbol"
+                    ),
                     textInput
                     (
                         inputId="gene_module",
                         label="Gene you want to analyze",
-                        value="gene1"
+                        value="stk33"
                     ),
                     actionButton
                     (
@@ -187,11 +194,18 @@ ui <- fluidPage( #Begins a flui page (change when windows dimensions change)
                 column
                 (
                     width=4,
+		    selectInput
+                    (
+                        inputId="gene_id_network",
+                        label="Gene name or gene symbol available?",
+                        choices=c("symbol","gene_name"),
+                        selected="symbol"
+                    ),
                     textInput
                     (
                         inputId="transcript_network",
                         label="Transcript you want to analyze",
-                        value="gene1"
+                        value="STK3"
                     ),
                     selectInput
                     (
@@ -221,15 +235,35 @@ ui <- fluidPage( #Begins a flui page (change when windows dimensions change)
                     plotOutput
                     (
                         outputId="NT",
-                        width="1500px",
+                        width="1080px",
                         height="720px",
-                        dblclick = "NT_dblclick",
-                        brush = brushOpts
-                        (
-                            id="NT_brush",
-                            resetOnNew = TRUE
-                        )
+			
                     )
+                )
+            )
+        ),
+	tabPanel(#Definition of a tab called search by gene feture
+            "Gene fold in all tissues",
+            fluidRow(
+                column(
+                    width=12,
+                    textInput
+                    (
+                        inputId="gene_fold_all",
+                        label="Gene to be searched",
+                        value="STK33",
+                        placeholder="Your gene"
+                    ),
+                    actionButton
+                    (
+                        inputId="search_fold_all",
+                        label="Search"
+                    )
+                ),
+                column
+                (
+                    width=12,
+                    tableOutput(outputId="GFA")
                 )
             )
         )
@@ -280,16 +314,26 @@ server <- function(input, output) {
 
     output$MO<-renderTable({
         input$search_module
+        ID_M<-isolate(input$gene_id_module)
         GENE<-isolate(input$gene_module)
-        SearchTranscriptGroup(GENE,"LITTLE_1000_Module_Data.Rdata","Little_1000_TOM-block.1.RData")
+        ##SearchTranscriptGroup(ID_M,GENE,"Gene_Modules.Rdata","TOM_Complete-block.1.RData")
+        SearchTranscriptGroup(ID_M,GENE,"Gene_Modules.Rdata",transcripts)
     })
 
     output$NT<-renderPlot({
         input$crate_network
-        TRAN<-isolate(input$transcript_network)
+	ID<-isolate(input$gene_id_network)
+	TRAN<-isolate(input$transcript_network)
         COR<-isolate(input$correlation_network)
         NUM<-isolate(input$number_network)
-        Network(TRAN,"LITTLE_1000_Module_Data.Rdata",data.fil,COR,NUM)        
+	
+        Network(ID,TRAN,"Gene_Modules.Rdata",data.fil,COR,NUM)        
+    })
+
+    output$GFA<-renderTable({
+        input$gene_fold_all
+        GENE_FOLD<-isolate(input$gene_fold_all)
+        GeneFoldTissue(GENE_FOLD,transcripts)
     })
 
 }
