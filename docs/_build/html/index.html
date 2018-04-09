@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>Welcome to Bufalo’s documentation! &#8212; Bufalo 0.01 documentation</title>
+    <title>Ballgown Extractor &#8212; Bufalo 0.01 documentation</title>
     <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script type="text/javascript" src="_static/documentation_options.js"></script>
@@ -15,6 +15,7 @@
     <script type="text/javascript" src="_static/doctools.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Installation" href="Installation.html" />
    
   <link rel="stylesheet" href="_static/custom.css" type="text/css" />
   
@@ -29,18 +30,58 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <div class="section" id="welcome-to-bufalo-s-documentation">
-<h1>Welcome to Bufalo’s documentation!<a class="headerlink" href="#welcome-to-bufalo-s-documentation" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="ballgown-extractor">
+<h1>Ballgown Extractor<a class="headerlink" href="#ballgown-extractor" title="Permalink to this headline">¶</a></h1>
+<p>Ballgown extractor is a collection of scripts, written in R and
+python, able to manage transcriptome data obtained by a <a class="reference external" href="https://www.ncbi.nlm.nih.gov/pubmed/27560171">pipeline</a> described by Petrea
+and collegues, which takes advantages of <a class="reference external" href="https://ccb.jhu.edu/software/hisat2/index.shtml">Hisat2</a>, <a class="reference external" href="https://ccb.jhu.edu/software/stringtie/">Stringtie</a> and the R package
+<a class="reference external" href="http://bioconductor.org/packages/release/bioc/html/ballgown.html">Ballgown</a>.
+In particular these scripts will allow you to extract information
+about single genes, tissues and gene features.</p>
+<p>In this project there are different scripts that produces the same
+result:</p>
+<ul class="simple">
+<li>A simple R script (reader.R);</li>
+<li>A python script (rpy_reader.py) that takes advantage of the <a class="reference external" href="https://pypi.python.org/pypi/rpy2">rpy2</a>
+library;</li>
+<li>A R script spawning a shiny app (App.R), that takes advantage of <a class="reference external" href="https://www.rstudio.com/products/shiny/">shiny</a></li>
+</ul>
+<div class="section" id="installation">
+<h2>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="Installation.html">Installation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="Installation.html#software-versions">Software Versions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Installation.html#r-packages-needed">R Packages Needed</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Installation.html#python-packages-needed">Python Packages Needed</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div class="section" id="usage">
+<h2>Usage<a class="headerlink" href="#usage" title="Permalink to this headline">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="Usage.html">As a R Script</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Usage.html#as-a-python-script">As a Python Script</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Usage.html#as-a-shiny-app">As a Shiny App</a></li>
+</ul>
+</div>
+</div>
+<div class="section" id="functions">
+<h2>Functions<a class="headerlink" href="#functions" title="Permalink to this headline">¶</a></h2>
 <div class="toctree-wrapper compound">
 </div>
 </div>
-<div class="section" id="indices-and-tables">
-<h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h1>
-<ul class="simple">
-<li><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></li>
-<li><a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a></li>
-<li><a class="reference internal" href="search.html"><span class="std std-ref">Search Page</span></a></li>
-</ul>
+<div class="section" id="another-simple-header">
+<h2>Another Simple Header<a class="headerlink" href="#another-simple-header" title="Permalink to this headline">¶</a></h2>
+<p>Here is some text explaining some complicated stuff</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span> <span class="s1">&#39;hello&#39;</span>
+<span class="o">&gt;&gt;</span><span class="n">hello</span>
+</pre></div>
+</div>
+</div>
 </div>
 
 
@@ -51,13 +92,19 @@
         <div class="sphinxsidebarwrapper">
   <h3><a href="#">Table Of Contents</a></h3>
   <ul>
-<li><a class="reference internal" href="#">Welcome to Bufalo’s documentation!</a></li>
-<li><a class="reference internal" href="#indices-and-tables">Indices and tables</a></li>
+<li><a class="reference internal" href="#">Ballgown Extractor</a><ul>
+<li><a class="reference internal" href="#installation">Installation</a></li>
+<li><a class="reference internal" href="#usage">Usage</a></li>
+<li><a class="reference internal" href="#functions">Functions</a></li>
+<li><a class="reference internal" href="#another-simple-header">Another Simple Header</a></li>
+</ul>
+</li>
 </ul>
 <div class="relations">
 <h3>Related Topics</h3>
 <ul>
   <li><a href="#">Documentation overview</a><ul>
+      <li>Next: <a href="Installation.html" title="next chapter">Installation</a></li>
   </ul></li>
 </ul>
 </div>
