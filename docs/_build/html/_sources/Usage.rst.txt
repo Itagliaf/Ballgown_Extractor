@@ -1,3 +1,4 @@
+=============
 As a R Script
 =============
 
@@ -10,7 +11,7 @@ To show a synthetic help, run the abouve command without any argument.
 
 The arguments are a numerical code that identifies a single function
 followed by it's arguments. To a more detailed description of the
-functions, check the here `Functions <Functions>`_.
+functions, check the here `Functions <Functions.html>`_.
 
 The arguments are the same for the python and R version
 
@@ -24,7 +25,7 @@ script as follows::
 
 The arguments are a numerical code that identifies a single function
 followed by it's arguments. To a more detailed description of the
-functions, check the here `Functions <Functions>`_.
+functions, check the here `Functions <Functions.html>`_.
 
 The arguments are the same for the python and R version
 
@@ -35,13 +36,16 @@ A user-friendly `shiny <https://shiny.rstudio.com/>`_ interface will
 be created using your computer as a local server. All the funtions
 will be available in a GUI in your browser.
 
-To use the interface, open a R interactive session::
+To use the interface
 
-  R
+* Move the "app.R","environment.R" and
+  "definition.R" files than open a R interactive session::
 
-And source the environment.R file ::
+    R
   
-  source("environment.R")
+* Source the environment.R file ::
+  
+    source("environment.R")
 
 This file import all the necessaries libraries and data and creates a
 shiny interface using your computer as server.

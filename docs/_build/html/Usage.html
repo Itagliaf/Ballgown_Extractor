@@ -41,11 +41,10 @@ follows:</p>
 <p>To show a synthetic help, run the abouve command without any argument.</p>
 <p>The arguments are a numerical code that identifies a single function
 followed by it’s arguments. To a more detailed description of the
-functions, check the here <a class="reference external" href="Functions">Functions</a>.</p>
+functions, check the here <a class="reference external" href="Functions.html">Functions</a>.</p>
 <p>The arguments are the same for the python and R version</p>
-</div>
 <div class="section" id="as-a-python-script">
-<h1>As a Python Script<a class="headerlink" href="#as-a-python-script" title="Permalink to this headline">¶</a></h1>
+<h2>As a Python Script<a class="headerlink" href="#as-a-python-script" title="Permalink to this headline">¶</a></h2>
 <p>All operations can be conducted simply running the proper python
 script as follows:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">python3</span> <span class="n">rpy_reader</span><span class="o">.</span><span class="n">py</span> <span class="p">[</span><span class="n">arguments</span><span class="p">]</span>
@@ -53,27 +52,34 @@ script as follows:</p>
 </div>
 <p>The arguments are a numerical code that identifies a single function
 followed by it’s arguments. To a more detailed description of the
-functions, check the here <a class="reference external" href="Functions">Functions</a>.</p>
+functions, check the here <a class="reference external" href="Functions.html">Functions</a>.</p>
 <p>The arguments are the same for the python and R version</p>
 </div>
 <div class="section" id="as-a-shiny-app">
-<h1>As a Shiny App<a class="headerlink" href="#as-a-shiny-app" title="Permalink to this headline">¶</a></h1>
+<h2>As a Shiny App<a class="headerlink" href="#as-a-shiny-app" title="Permalink to this headline">¶</a></h2>
 <p>A user-friendly <a class="reference external" href="https://shiny.rstudio.com/">shiny</a> interface will
 be created using your computer as a local server. All the funtions
 will be available in a GUI in your browser.</p>
-<p>To use the interface, open a R interactive session:</p>
+<p>To use the interface</p>
+<ul>
+<li><p class="first">Move the “app.R”,”environment.R” and
+“definition.R” files than open a R interactive session:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">R</span>
 </pre></div>
 </div>
-<p>And source the environment.R file</p>
+</li>
+<li><p class="first">Source the environment.R file</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">source</span><span class="p">(</span><span class="s2">&quot;environment.R&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
+</li>
+</ul>
 <p>This file import all the necessaries libraries and data and creates a
 shiny interface using your computer as server.</p>
 <p>Warning: if you run the scripts in this way, consider that the server
 is your own computer: in case of big data make shure you hane enough
 memory.</p>
+</div>
 </div>
 
 
@@ -84,9 +90,11 @@ memory.</p>
         <div class="sphinxsidebarwrapper">
   <h3><a href="index.html">Table Of Contents</a></h3>
   <ul>
-<li><a class="reference internal" href="#">As a R Script</a></li>
+<li><a class="reference internal" href="#">As a R Script</a><ul>
 <li><a class="reference internal" href="#as-a-python-script">As a Python Script</a></li>
 <li><a class="reference internal" href="#as-a-shiny-app">As a Shiny App</a></li>
+</ul>
+</li>
 </ul>
 <div class="relations">
 <h3>Related Topics</h3>

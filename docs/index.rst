@@ -24,27 +24,30 @@ result:
   
 * A R script spawning a shiny app (App.R), that takes advantage of `shiny <https://www.rstudio.com/products/shiny/>`_
 
+============
 Installation
 ============
 
 .. toctree::
-   :maxdepth: 3
+   :maxdepth: 2
 
    Installation
-   
+
+=====
 Usage
 =====
  
 .. toctree::
-   :maxdepth: 3
+   :maxdepth: 2
 
    Usage
 
+=========
 Functions
 =========
 
 .. toctree::
-   :maxdepth: 3
+   :maxdepth: 2
 
    Functions
    
