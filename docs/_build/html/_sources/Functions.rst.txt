@@ -24,7 +24,7 @@ Arguments:
 * Mapping File: data frame with rows corresponding to samples and
   columns corresponding to phenotipic variables. Up to now, this file
   was structured as follows:
-
+  
   +-------+-----------+
   |  ids  | tissue    |
   +=======+===========+
@@ -36,16 +36,17 @@ Arguments:
   Reporting only the tissue name. If a file presents more columns,
   there should be no problem because they will be ignored. This file
   will be used as the argument pData in the "ballgown" function
-  (`Ballgown documentation <https://bioconductor.org/packages/release/bioc/manuals/ballgown/man/ballgown.pdf>`_);
+  (`Ballgown documentation <https://bioconductor.org/packages/release/bioc/manuals/ballgown/man/ballgown.pdf>`_).
 
 * Folder Containing The Data: folder containing the results from the
   `pipeline <https://www.ncbi.nlm.nih.gov/pubmed/27560171>`_ described
-  by Petrea and collegues;
+  by Petrea and collegues.
 
 * Common part of samples name: a common root or part of samples name
   needed by ballgown to extract properl all the data needed.
 
-
+**This function is not available for the shiny app: this step must be executed via command line**
+  
 ----------------
 Plotter (code=1)
 ----------------
@@ -82,6 +83,116 @@ Syntax:
    Rscript reader.R 2 <tissue> [gene]
    python3 rpy_reader.py 1 <tissue> [gene]
 
-* tissue: the tissue name to be analyzed
+* tissue: the tissue name to be analyzed.
 
 * gene: [optional] the gene symbol (name) to be analyzed.
+
+
+-------------------------
+Search By Gene (code=3)
+-------------------------
+
+Searches the FPKM values of a single gene in all tissues.
+
+Syntax:
+-------
+
+::
+   
+   Rscript reader.R 3 <gene>
+   python3 rpy_reader.py 3 <gene> 
+
+* gene: the gene symbol (name) to be analyzed.
+
+-------------------------------
+Search By Gene Feature (code=4)
+-------------------------------
+
+Allows to analyze the expression of gene feature (exons and introns).
+
+Syntax:
+-------
+
+::
+   
+   Rscript reader.R 4 <gene> <feature>
+   python3 rpy_reader.py 4 <gene> <feature>
+
+* gene: the gene symbol (name) to be analyzed.
+
+* feature: the gene feature to analyzed. Possible values: intron, exon.
+
+------------------------------------
+Search By Differential Fold (code=5)
+------------------------------------
+
+Given 2 tissues, the differential fold (linear and log2) is
+calculated. To avoid "Inf" values, to all FPKM values was added
+0.000001. If a fourth argument is given reporting a gene name, the
+function will consider only the entries containing only that
+gene.
+
+Syntax:
+-------
+
+::
+   
+   Rscript reader.R 5 <tissue 1> <tissue 2> [gene]
+   python3 rpy_reader.py 5 <tissue 1> <tissue 2> [gene]
+
+* tissue 1: First tissue to be considered.
+
+* tissue 2: Second tissue to be considered.
+
+* gene: [optional] the gene symbol (name) to be analyzed.
+
+------------------------------------
+Search By Differential Fold (code=6)
+------------------------------------
+
+Given a gene symbol, the coexpression module, found with WGCNA is
+returned.
+
+Syntax:
+-------
+
+::
+   
+   Rscript reader.R 6 <gene> <ModuleFile>
+   python3 rpy_reader.py 6 <gene> <ModuleFile>
+
+* gene: the gene symbol (name) to be analyzed.
+* File containing the coexpression module found with `WGCNA
+  <https://labs.genetics.ucla.edu/horvath/CoexpressionNetwork/Rpackages/WGCNA/>`_.
+
+  **AGGIUNGERE LO SCRIPT PER LA COESPRESSIONE NELLA REPO**
+
+
+------------------------------------
+Search By Differential Fold (code=6)
+------------------------------------
+
+Given a gene symbol, from the coexpression module, found with `WGCNA
+<https://labs.genetics.ucla.edu/horvath/CoexpressionNetwork/Rpackages/WGCNA/>`_
+a network graph containing only n nodes (genes) over a certain
+correlation value is produced Arguments:
+
+Syntax:
+-------
+
+::
+   
+   Rscript reader.R 7 <symbol> <gene> <ModuleFile> <corr> <nodes> 
+   python3 rpy_reader.py 7 <symbol> <gene> <ModuleFile> <corr> <nodes> 
+
+* symbol: a legacy argument. Use symbol as first argument (to removed
+  in the next versions).
+* gene: the gene symbol (name) to be analyzed.
+* File containing the coexpression module found with `WGCNA
+  <https://labs.genetics.ucla.edu/horvath/CoexpressionNetwork/Rpackages/WGCNA/>`_.
+* Correlation threashold value to show a connection between 2 genes.
+* Number of nodes-genes to be shown.
+
+  **AGGIUNGERE LO SCRIPT PER LA COESPRESSIONE NELLA REPO**
+
+  

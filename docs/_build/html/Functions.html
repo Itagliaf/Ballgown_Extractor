@@ -72,16 +72,17 @@ was structured as follows:</p>
 <p>Reporting only the tissue name. If a file presents more columns,
 there should be no problem because they will be ignored. This file
 will be used as the argument pData in the “ballgown” function
-(<a class="reference external" href="https://bioconductor.org/packages/release/bioc/manuals/ballgown/man/ballgown.pdf">Ballgown documentation</a>);</p>
+(<a class="reference external" href="https://bioconductor.org/packages/release/bioc/manuals/ballgown/man/ballgown.pdf">Ballgown documentation</a>).</p>
 </li>
 <li><p class="first">Folder Containing The Data: folder containing the results from the
 <a class="reference external" href="https://www.ncbi.nlm.nih.gov/pubmed/27560171">pipeline</a> described
-by Petrea and collegues;</p>
+by Petrea and collegues.</p>
 </li>
 <li><p class="first">Common part of samples name: a common root or part of samples name
 needed by ballgown to extract properl all the data needed.</p>
 </li>
 </ul>
+<p><strong>This function is not available for the shiny app: this step must be executed via command line</strong></p>
 </div>
 </div>
 <div class="section" id="plotter-code-1">
@@ -113,8 +114,103 @@ given, the FPKM of this gene insider the chosen Tissue.</p>
 </pre></div>
 </div>
 <ul class="simple">
-<li>tissue: the tissue name to be analyzed</li>
+<li>tissue: the tissue name to be analyzed.</li>
 <li>gene: [optional] the gene symbol (name) to be analyzed.</li>
+</ul>
+</div>
+</div>
+<div class="section" id="search-by-gene-code-3">
+<h2>Search By Gene (code=3)<a class="headerlink" href="#search-by-gene-code-3" title="Permalink to this headline">¶</a></h2>
+<p>Searches the FPKM values of a single gene in all tissues.</p>
+<div class="section" id="id4">
+<h3>Syntax:<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Rscript</span> <span class="n">reader</span><span class="o">.</span><span class="n">R</span> <span class="mi">3</span> <span class="o">&lt;</span><span class="n">gene</span><span class="o">&gt;</span>
+<span class="n">python3</span> <span class="n">rpy_reader</span><span class="o">.</span><span class="n">py</span> <span class="mi">3</span> <span class="o">&lt;</span><span class="n">gene</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li>gene: the gene symbol (name) to be analyzed.</li>
+</ul>
+</div>
+</div>
+<div class="section" id="search-by-gene-feature-code-4">
+<h2>Search By Gene Feature (code=4)<a class="headerlink" href="#search-by-gene-feature-code-4" title="Permalink to this headline">¶</a></h2>
+<p>Allows to analyze the expression of gene feature (exons and introns).</p>
+<div class="section" id="id5">
+<h3>Syntax:<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Rscript</span> <span class="n">reader</span><span class="o">.</span><span class="n">R</span> <span class="mi">4</span> <span class="o">&lt;</span><span class="n">gene</span><span class="o">&gt;</span> <span class="o">&lt;</span><span class="n">feature</span><span class="o">&gt;</span>
+<span class="n">python3</span> <span class="n">rpy_reader</span><span class="o">.</span><span class="n">py</span> <span class="mi">4</span> <span class="o">&lt;</span><span class="n">gene</span><span class="o">&gt;</span> <span class="o">&lt;</span><span class="n">feature</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li>gene: the gene symbol (name) to be analyzed.</li>
+<li>feature: the gene feature to analyzed. Possible values: intron, exon.</li>
+</ul>
+</div>
+</div>
+<div class="section" id="search-by-differential-fold-code-5">
+<h2>Search By Differential Fold (code=5)<a class="headerlink" href="#search-by-differential-fold-code-5" title="Permalink to this headline">¶</a></h2>
+<p>Given 2 tissues, the differential fold (linear and log2) is
+calculated. To avoid “Inf” values, to all FPKM values was added
+0.000001. If a fourth argument is given reporting a gene name, the
+function will consider only the entries containing only that
+gene.</p>
+<div class="section" id="id6">
+<h3>Syntax:<a class="headerlink" href="#id6" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Rscript</span> <span class="n">reader</span><span class="o">.</span><span class="n">R</span> <span class="mi">5</span> <span class="o">&lt;</span><span class="n">tissue</span> <span class="mi">1</span><span class="o">&gt;</span> <span class="o">&lt;</span><span class="n">tissue</span> <span class="mi">2</span><span class="o">&gt;</span> <span class="p">[</span><span class="n">gene</span><span class="p">]</span>
+<span class="n">python3</span> <span class="n">rpy_reader</span><span class="o">.</span><span class="n">py</span> <span class="mi">5</span> <span class="o">&lt;</span><span class="n">tissue</span> <span class="mi">1</span><span class="o">&gt;</span> <span class="o">&lt;</span><span class="n">tissue</span> <span class="mi">2</span><span class="o">&gt;</span> <span class="p">[</span><span class="n">gene</span><span class="p">]</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li>tissue 1: First tissue to be considered.</li>
+<li>tissue 2: Second tissue to be considered.</li>
+<li>gene: [optional] the gene symbol (name) to be analyzed.</li>
+</ul>
+</div>
+</div>
+<div class="section" id="search-by-differential-fold-code-6">
+<h2>Search By Differential Fold (code=6)<a class="headerlink" href="#search-by-differential-fold-code-6" title="Permalink to this headline">¶</a></h2>
+<p>Given a gene symbol, the coexpression module, found with WGCNA is
+returned.</p>
+<div class="section" id="id7">
+<h3>Syntax:<a class="headerlink" href="#id7" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Rscript</span> <span class="n">reader</span><span class="o">.</span><span class="n">R</span> <span class="mi">6</span> <span class="o">&lt;</span><span class="n">gene</span><span class="o">&gt;</span> <span class="o">&lt;</span><span class="n">ModuleFile</span><span class="o">&gt;</span>
+<span class="n">python3</span> <span class="n">rpy_reader</span><span class="o">.</span><span class="n">py</span> <span class="mi">6</span> <span class="o">&lt;</span><span class="n">gene</span><span class="o">&gt;</span> <span class="o">&lt;</span><span class="n">ModuleFile</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+<ul>
+<li><p class="first">gene: the gene symbol (name) to be analyzed.</p>
+</li>
+<li><p class="first">File containing the coexpression module found with <a class="reference external" href="https://labs.genetics.ucla.edu/horvath/CoexpressionNetwork/Rpackages/WGCNA/">WGCNA</a>.</p>
+<p><strong>AGGIUNGERE LO SCRIPT PER LA COESPRESSIONE NELLA REPO</strong></p>
+</li>
+</ul>
+</div>
+</div>
+<div class="section" id="id8">
+<h2>Search By Differential Fold (code=6)<a class="headerlink" href="#id8" title="Permalink to this headline">¶</a></h2>
+<p>Given a gene symbol, from the coexpression module, found with <a class="reference external" href="https://labs.genetics.ucla.edu/horvath/CoexpressionNetwork/Rpackages/WGCNA/">WGCNA</a>
+a network graph containing only n nodes (genes) over a certain
+correlation value is produced Arguments:</p>
+<div class="section" id="id10">
+<h3>Syntax:<a class="headerlink" href="#id10" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Rscript</span> <span class="n">reader</span><span class="o">.</span><span class="n">R</span> <span class="mi">7</span> <span class="o">&lt;</span><span class="n">symbol</span><span class="o">&gt;</span> <span class="o">&lt;</span><span class="n">gene</span><span class="o">&gt;</span> <span class="o">&lt;</span><span class="n">ModuleFile</span><span class="o">&gt;</span> <span class="o">&lt;</span><span class="n">corr</span><span class="o">&gt;</span> <span class="o">&lt;</span><span class="n">nodes</span><span class="o">&gt;</span>
+<span class="n">python3</span> <span class="n">rpy_reader</span><span class="o">.</span><span class="n">py</span> <span class="mi">7</span> <span class="o">&lt;</span><span class="n">symbol</span><span class="o">&gt;</span> <span class="o">&lt;</span><span class="n">gene</span><span class="o">&gt;</span> <span class="o">&lt;</span><span class="n">ModuleFile</span><span class="o">&gt;</span> <span class="o">&lt;</span><span class="n">corr</span><span class="o">&gt;</span> <span class="o">&lt;</span><span class="n">nodes</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+<ul>
+<li><p class="first">symbol: a legacy argument. Use symbol as first argument (to removed
+in the next versions).</p>
+</li>
+<li><p class="first">gene: the gene symbol (name) to be analyzed.</p>
+</li>
+<li><p class="first">File containing the coexpression module found with <a class="reference external" href="https://labs.genetics.ucla.edu/horvath/CoexpressionNetwork/Rpackages/WGCNA/">WGCNA</a>.</p>
+</li>
+<li><p class="first">Correlation threashold value to show a connection between 2 genes.</p>
+</li>
+<li><p class="first">Number of nodes-genes to be shown.</p>
+<p><strong>AGGIUNGERE LO SCRIPT PER LA COESPRESSIONE NELLA REPO</strong></p>
+</li>
 </ul>
 </div>
 </div>
@@ -139,6 +235,26 @@ given, the FPKM of this gene insider the chosen Tissue.</p>
 </li>
 <li><a class="reference internal" href="#search-by-tissue-code-2">Search By Tissue (code=2)</a><ul>
 <li><a class="reference internal" href="#id3">Syntax:</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#search-by-gene-code-3">Search By Gene (code=3)</a><ul>
+<li><a class="reference internal" href="#id4">Syntax:</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#search-by-gene-feature-code-4">Search By Gene Feature (code=4)</a><ul>
+<li><a class="reference internal" href="#id5">Syntax:</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#search-by-differential-fold-code-5">Search By Differential Fold (code=5)</a><ul>
+<li><a class="reference internal" href="#id6">Syntax:</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#search-by-differential-fold-code-6">Search By Differential Fold (code=6)</a><ul>
+<li><a class="reference internal" href="#id7">Syntax:</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id8">Search By Differential Fold (code=6)</a><ul>
+<li><a class="reference internal" href="#id10">Syntax:</a></li>
 </ul>
 </li>
 </ul>
