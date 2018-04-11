@@ -3,7 +3,7 @@ ui <- fluidPage( #Begins a flui page (change when windows dimensions change)
     tabsetPanel(
         tabPanel(
             ##A better name must be found
-            "Plotter",
+            "Plotter2",
            
             fluidRow
             (
