@@ -25,3 +25,6 @@ print("Installing igraph")
 install.packages("igraph",repos="https://cran.stat.unipd.it/")
 EOF
 
+echo -e "Installing python packages"
+
+pip3 install rpy2
