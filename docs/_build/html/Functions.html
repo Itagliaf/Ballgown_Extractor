@@ -15,6 +15,7 @@
     <script type="text/javascript" src="_static/doctools.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Coexpression" href="Coexpression.html" />
     <link rel="prev" title="As a R Script" href="Usage.html" />
    
   <link rel="stylesheet" href="_static/custom.css" type="text/css" />
@@ -168,8 +169,8 @@ gene.</p>
 </ul>
 </div>
 </div>
-<div class="section" id="search-by-differential-fold-code-6">
-<h2>Search By Differential Fold (code=6)<a class="headerlink" href="#search-by-differential-fold-code-6" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="search-coexpression-group-code-6">
+<h2>Search Coexpression Group (code=6)<a class="headerlink" href="#search-coexpression-group-code-6" title="Permalink to this headline">¶</a></h2>
 <p>Given a gene symbol, the coexpression module, found with WGCNA is
 returned.</p>
 <div class="section" id="id7">
@@ -178,39 +179,52 @@ returned.</p>
 <span class="n">python3</span> <span class="n">rpy_reader</span><span class="o">.</span><span class="n">py</span> <span class="mi">6</span> <span class="o">&lt;</span><span class="n">gene</span><span class="o">&gt;</span> <span class="o">&lt;</span><span class="n">ModuleFile</span><span class="o">&gt;</span>
 </pre></div>
 </div>
-<ul>
-<li><p class="first">gene: the gene symbol (name) to be analyzed.</p>
-</li>
-<li><p class="first">File containing the coexpression module found with <a class="reference external" href="https://labs.genetics.ucla.edu/horvath/CoexpressionNetwork/Rpackages/WGCNA/">WGCNA</a>.</p>
-<p><strong>AGGIUNGERE LO SCRIPT PER LA COESPRESSIONE NELLA REPO</strong></p>
-</li>
+<ul class="simple">
+<li>gene: the gene symbol (name) to be analyzed.</li>
+<li>File containing the coexpression module found with <a class="reference external" href="https://labs.genetics.ucla.edu/horvath/CoexpressionNetwork/Rpackages/WGCNA/">WGCNA</a>.
+To obtain the ModuleFile, run the “coexpression.R” script as
+reported in <a class="reference external" href="Coexpression.html">Coexpression</a></li>
 </ul>
 </div>
 </div>
-<div class="section" id="id8">
-<h2>Search By Differential Fold (code=6)<a class="headerlink" href="#id8" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="create-network-grpah-code-7">
+<h2>Create Network Grpah (code=7)<a class="headerlink" href="#create-network-grpah-code-7" title="Permalink to this headline">¶</a></h2>
 <p>Given a gene symbol, from the coexpression module, found with <a class="reference external" href="https://labs.genetics.ucla.edu/horvath/CoexpressionNetwork/Rpackages/WGCNA/">WGCNA</a>
 a network graph containing only n nodes (genes) over a certain
 correlation value is produced Arguments:</p>
-<div class="section" id="id10">
-<h3>Syntax:<a class="headerlink" href="#id10" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id9">
+<h3>Syntax:<a class="headerlink" href="#id9" title="Permalink to this headline">¶</a></h3>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Rscript</span> <span class="n">reader</span><span class="o">.</span><span class="n">R</span> <span class="mi">7</span> <span class="o">&lt;</span><span class="n">symbol</span><span class="o">&gt;</span> <span class="o">&lt;</span><span class="n">gene</span><span class="o">&gt;</span> <span class="o">&lt;</span><span class="n">ModuleFile</span><span class="o">&gt;</span> <span class="o">&lt;</span><span class="n">corr</span><span class="o">&gt;</span> <span class="o">&lt;</span><span class="n">nodes</span><span class="o">&gt;</span>
 <span class="n">python3</span> <span class="n">rpy_reader</span><span class="o">.</span><span class="n">py</span> <span class="mi">7</span> <span class="o">&lt;</span><span class="n">symbol</span><span class="o">&gt;</span> <span class="o">&lt;</span><span class="n">gene</span><span class="o">&gt;</span> <span class="o">&lt;</span><span class="n">ModuleFile</span><span class="o">&gt;</span> <span class="o">&lt;</span><span class="n">corr</span><span class="o">&gt;</span> <span class="o">&lt;</span><span class="n">nodes</span><span class="o">&gt;</span>
 </pre></div>
 </div>
-<ul>
-<li><p class="first">symbol: a legacy argument. Use symbol as first argument (to removed
-in the next versions).</p>
-</li>
-<li><p class="first">gene: the gene symbol (name) to be analyzed.</p>
-</li>
-<li><p class="first">File containing the coexpression module found with <a class="reference external" href="https://labs.genetics.ucla.edu/horvath/CoexpressionNetwork/Rpackages/WGCNA/">WGCNA</a>.</p>
-</li>
-<li><p class="first">Correlation threashold value to show a connection between 2 genes.</p>
-</li>
-<li><p class="first">Number of nodes-genes to be shown.</p>
-<p><strong>AGGIUNGERE LO SCRIPT PER LA COESPRESSIONE NELLA REPO</strong></p>
-</li>
+<ul class="simple">
+<li>symbol: a legacy argument. Use symbol as first argument (to removed
+in the next versions).</li>
+<li>gene: the gene symbol (name) to be analyzed.</li>
+<li>File containing the coexpression module found with <a class="reference external" href="https://labs.genetics.ucla.edu/horvath/CoexpressionNetwork/Rpackages/WGCNA/">WGCNA</a>.</li>
+<li>Correlation threashold value to show a connection between 2 genes.</li>
+<li>Number of nodes-genes to be shown.</li>
+</ul>
+<p>To obtain the ModuleFile, run the “coexpression.R” script as
+reported in <a class="reference external" href="Coexpression.html">Coexpression</a></p>
+</div>
+</div>
+<div class="section" id="differential-fold-of-a-gene-in-all-tissues-code-8">
+<h2>Differential fold of a gene in all tissues (code=8)<a class="headerlink" href="#differential-fold-of-a-gene-in-all-tissues-code-8" title="Permalink to this headline">¶</a></h2>
+<p>Given a gene symbol, the differential fold in all tissues is
+calculated considering a wanted tissue as reference.</p>
+<p>** UP TO NOW, THE TISSUE IS HARDCODED AS OVIDUCT**</p>
+<div class="section" id="id12">
+<h3>Syntax:<a class="headerlink" href="#id12" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Rscript</span> <span class="n">reader</span><span class="o">.</span><span class="n">R</span> <span class="mi">8</span> <span class="o">&lt;</span><span class="n">gene</span><span class="o">&gt;</span> <span class="o">&lt;</span><span class="n">reference</span> <span class="n">tissue</span><span class="o">&gt;</span>
+<span class="n">python3</span> <span class="n">rpy_reader</span><span class="o">.</span><span class="n">py</span> <span class="mi">8</span> <span class="o">&lt;</span><span class="n">gene</span><span class="o">&gt;</span> <span class="o">&lt;</span><span class="n">reference</span> <span class="n">tissue</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li>gene: a gene of intereset (gene symbol)</li>
+<li>reference tissue: a tissue to be considered as reference to the
+calculation of the differential fold.</li>
 </ul>
 </div>
 </div>
@@ -249,12 +263,16 @@ in the next versions).</p>
 <li><a class="reference internal" href="#id6">Syntax:</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#search-by-differential-fold-code-6">Search By Differential Fold (code=6)</a><ul>
+<li><a class="reference internal" href="#search-coexpression-group-code-6">Search Coexpression Group (code=6)</a><ul>
 <li><a class="reference internal" href="#id7">Syntax:</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#id8">Search By Differential Fold (code=6)</a><ul>
-<li><a class="reference internal" href="#id10">Syntax:</a></li>
+<li><a class="reference internal" href="#create-network-grpah-code-7">Create Network Grpah (code=7)</a><ul>
+<li><a class="reference internal" href="#id9">Syntax:</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#differential-fold-of-a-gene-in-all-tissues-code-8">Differential fold of a gene in all tissues (code=8)</a><ul>
+<li><a class="reference internal" href="#id12">Syntax:</a></li>
 </ul>
 </li>
 </ul>
@@ -265,6 +283,7 @@ in the next versions).</p>
 <ul>
   <li><a href="index.html">Documentation overview</a><ul>
       <li>Previous: <a href="Usage.html" title="previous chapter">As a R Script</a></li>
+      <li>Next: <a href="Coexpression.html" title="next chapter">Coexpression</a></li>
   </ul></li>
 </ul>
 </div>

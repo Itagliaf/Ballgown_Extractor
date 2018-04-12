@@ -24,6 +24,7 @@ result:
   
 * A R script spawning a shiny app (App.R), that takes advantage of `shiny <https://www.rstudio.com/products/shiny/>`_
 
+
 ============
 Installation
 ============
@@ -31,12 +32,14 @@ Installation
 .. toctree::
    :maxdepth: 2
 
+
    Installation
 
 =====
 Usage
 =====
- 
+
+
 .. toctree::
    :maxdepth: 2
 
@@ -51,20 +54,19 @@ Functions
 
    Functions
    
-
-Another Simple Header
-=====================
-
-Here is some text explaining some complicated stuff ::
-
-  print 'hello'
-  >>hello
+============
+Coexpression
+============
 
 
+.. toctree::
+   :maxdepth: 1
 
-..
-   Indices and tables
-   ==================
+   Coexpression
+
+
+Indices and tables
+==================
 
    * :ref:`genindex`
    * :ref:`modindex`

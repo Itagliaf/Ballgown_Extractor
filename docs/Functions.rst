@@ -147,7 +147,7 @@ Syntax:
 * gene: [optional] the gene symbol (name) to be analyzed.
 
 ------------------------------------
-Search By Differential Fold (code=6)
+Search Coexpression Group (code=6)
 ------------------------------------
 
 Given a gene symbol, the coexpression module, found with WGCNA is
@@ -164,12 +164,12 @@ Syntax:
 * gene: the gene symbol (name) to be analyzed.
 * File containing the coexpression module found with `WGCNA
   <https://labs.genetics.ucla.edu/horvath/CoexpressionNetwork/Rpackages/WGCNA/>`_.
-
-  **AGGIUNGERE LO SCRIPT PER LA COESPRESSIONE NELLA REPO**
+  To obtain the ModuleFile, run the "coexpression.R" script as
+  reported in `Coexpression <Coexpression.html>`_
 
 
 ------------------------------------
-Search By Differential Fold (code=6)
+Create Network Grpah (code=7)
 ------------------------------------
 
 Given a gene symbol, from the coexpression module, found with `WGCNA
@@ -193,6 +193,28 @@ Syntax:
 * Correlation threashold value to show a connection between 2 genes.
 * Number of nodes-genes to be shown.
 
-  **AGGIUNGERE LO SCRIPT PER LA COESPRESSIONE NELLA REPO**
 
-  
+To obtain the ModuleFile, run the "coexpression.R" script as
+reported in `Coexpression <Coexpression.html>`_
+
+---------------------------------------------------
+Differential fold of a gene in all tissues (code=8)
+---------------------------------------------------
+
+Given a gene symbol, the differential fold in all tissues is
+calculated considering a wanted tissue as reference.
+
+** UP TO NOW, THE TISSUE IS HARDCODED AS OVIDUCT**
+
+Syntax:
+-------
+
+::
+
+   Rscript reader.R 8 <gene> <reference tissue>
+   python3 rpy_reader.py 8 <gene> <reference tissue>
+
+* gene: a gene of intereset (gene symbol)
+
+* reference tissue: a tissue to be considered as reference to the
+  calculation of the differential fold.

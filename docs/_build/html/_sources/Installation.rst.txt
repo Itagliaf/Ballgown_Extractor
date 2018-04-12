@@ -31,7 +31,10 @@ R Packages Needed
 
 * `shiny <https://www.rstudio.com/products/shiny/>`_ 
 
-
+* `WGCNA
+  <https://labs.genetics.ucla.edu/horvath/CoexpressionNetwork/Rpackages/WGCNA/>`_:
+  is necessary for running coexpression analyses
+  
 Python Packages Needed
 ----------------------
 
