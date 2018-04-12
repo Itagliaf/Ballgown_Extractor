@@ -134,25 +134,6 @@ phenodata=robjects.r('phenodata')
 #to format output files name
 now = datetime.datetime.now()
 time=now.strftime("%Y%m%d%H%M")
-
-
-# if str(sys.argv[1])=="1":
-#     print("\n Function: Plotter")
-#     if len(sys.argv)==3:
-#         Plotter=robjects.r('Plotter')
-#         Plot=Plotter(sys.argv[2],transcripts)
-        
-#     else:
-#         print("\n ATTENTION: Parsing Arguments Error")
-#         exp_spacer_up()
-#         print("Argument 1: gene symbol of gene you want to analyze or file containing the gene names to be analyzed (sep='\\n')")
-#         exp_spacer_down()
-#         sys.exit("Exiting")
-
-#     out_name="Plotter_"+sys.argv[2]+"_"+time+".png"
-#     grdevices.png(file=out_name, width=1080, height=720)
-#     rprint(Plot)
-#     grdevices.dev_off()
     
 if str(sys.argv[1])=="1":
     print("\n Function: Plotter")
@@ -287,12 +268,13 @@ NB: this value is considered ad absolute value: both positive and negative conne
 
 if sys.argv[1]=="8":
     print("\n Function: Gene Fold Change Between Tissues")
-    if len(sys.argv)==3:
+    if len(sys.argv)==4:
         GeneFoldTissue=robjects.r("GeneFoldTissue")
-        GeneFold=GeneFoldTissue(sys.argv[2],transcritps)
+        GeneFold=GeneFoldTissue(sys.argv[2],sys.argv[3],transcripts)
     else:
         print("\n ATTENTION: Parsing Arguments Error")
         exp_spacer_up()
         print("Argument 1: gene symbol (Eg stk33, abcd1) to be searched")
+        print("Argument 2: tissue to be considered as reference")
         exp_spacer_down()
         sys.exit("Exiting")
