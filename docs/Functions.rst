@@ -204,7 +204,6 @@ Differential fold of a gene in all tissues (code=8)
 Given a gene symbol, the differential fold in all tissues is
 calculated considering a wanted tissue as reference.
 
-** UP TO NOW, THE TISSUE IS HARDCODED AS OVIDUCT**
 
 Syntax:
 -------

@@ -494,13 +494,16 @@ Network<-function(query_type,query,MODULES,Transcripts,corr,results)
 }
 
 
-GeneFoldTissue<-function(Name,Transcripts)
+GeneFoldTissue<-function(Name,TissueRef,Transcripts)
 ##subsets the dataframe to extract only 2 tissues and confront their expression (fold expression)
 {
     print("Search By Differential of a gene")
     Name<-toupper(Name)
     print(Name)
-    
+    gsub(" ",".",TissueRef)
+    TissueRef<-tolower(TissueRef)
+    print(TissueRef)
+
     FPKM_ONLY<-transcripts[,grep("FPKM",colnames(transcripts))]    
     FPKM_ONLY$gene_name<-transcripts$gene_name
     FPKM_ONLY$t_name<-transcripts$t_name
@@ -519,8 +522,17 @@ GeneFoldTissue<-function(Name,Transcripts)
 
     ## the median of the mean values of transcritption guarantee that
     ## oviduct is a pretty "average" tissue
-    ref<-GENE_FPKM$FPKM.oviduct
+    ##ref<-GENE_FPKM$FPKM.oviduct
+    TissueFpkm=paste("FPKM",TissueRef,"sep"=".")
 
+    ref=tryCatch(GENE_FPKM[,TissueFpkm],
+        error=function(e){
+            stop("Tissue not found, check the spelling")
+        }
+    )
+
+    
+    
     ##fold change (logarithmic)
     FC=log2(GENE_FPKM[,c(1:29)]/ref)		
     FC$gene_name<-GENE_FPKM$gene_name

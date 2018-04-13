@@ -218,30 +218,17 @@ switch(args[1],
                ##modules (TOM files from WGCNA pipeline)
                Network(args[2],args[3],args[4],transcripts,args[5],args[6])
            },
-       "8"=if(length(args)<2)
+       "8"=if(length(args)<3)
            {
 		print("Differential fold of a gene in all tissues")
 		print("Argument2: Query name (gene symbol)")
 	   }else
 	   {
 		print("Differential fold of a gene in all tissues")
-		GeneFoldTissue<-GeneFoldTissue(args[2],transcripts)
+		GeneFoldTissue<-GeneFoldTissue(args[2],args[3],transcripts)
 
 		out_file=paste("GeneFold",args[2],File_Hash,sep="_")	
                 write.table(GeneFoldTissue, out_file,row.names=FALSE,col.names=TRUE)	
 	   },
-       "15"=if(length(args)<2)
-           {
-              print("Plotter: plots FPKM vaules of one or more genes in all tissue considered")
-              print("Argument 2: File containig the genes names to be analyzed (sep=\n)")
-              print("Exiting")
-              stop("Insufficient Arguments")
-           }else{
-           
-               print("Plotter: plots FPKM vaules of one or more genes in all tissue considered")
-                                        #Genes<-scan(args[2],what="character")
-               Genes<-args[2]
-               p<-Plotter2(Genes,data.fil)
-           },
     PrintHelp()
 )	   
