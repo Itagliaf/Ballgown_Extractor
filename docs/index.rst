@@ -65,7 +65,7 @@ Coexpression
    Coexpression
 
 ==================
-Indices and tables
+Search
 ==================
 
    * :ref:`search`
