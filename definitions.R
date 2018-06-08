@@ -1,186 +1,141 @@
 library(ballgown)	
-Plotter2<-function(gene,Data.Fil)
+library(dplyr)
+library(genefilter)
+
+lotter2<-function(GENE, MEAS="FPKM", SAMPLES=pData(bg)$ids,BASEDIR=getwd(), bg)
 {
-    ##plots all transcripts realtive to a single gene relatively to all tissues
-
-    gene<-toupper(gene)
+    ##plots all transcripts relative to a single gene relatively to all tissues.
     
-    gene_row<-match(gene,ballgown::geneNames(data.fil))
-    gn<-ballgown::geneIDs(data.fil)[gene_row]
+    ##vvvv add random string from stringi package?vvvv
+    file_hash<-paste(format(Sys.time(), "%d%H%M%s"))
+    ##^^^^ add random string from stringi package?^^^^
     
-
-    out_file <- paste(gene,"png",sep=".")
-    png(out_file,width=1080,height=720)
-
-    par(mar = rep(2, 4))
-    plotTranscripts(gn,data.fil,sample=phenodata$ids)
+    
+    gene<-toupper(GENE)
+    
+    ## vvvv MARCONI CAN'T CREATE PNG, switching to pdf
+    
+    out_file1 <- paste(GENE, MEAS, file_hash,"png", sep=".")
+    out_file2 <- paste(BASEDIR,out_file1,sep="/")
+    png(out_file2,width=1080,height=720)
+    
+    par(mar = rep(2, 4))    
+    plotTranscripts(GENE,bg, meas=MEAS, sample=SAMPLES, labelTranscripts=T, legend=T, colorby="transcript")
+    
     dev.off()
-    ##return(P)
+    
     return(0)
 }
 
-NameFormatter<-function(Transcripts,phenodata)
-    ##formats in a better way the names of the columns
 
-{
-    ##takes the names from the transcripts dataframe
-    NamesOriginal<-colnames(Transcripts)
 
-    ##takes the names of the tissue from phenodata
-    Tissue_Names<-phenodata[,2]
+
+SearchByCondition<-function(COMBO_CONDITIONS, GENE=NULL, bg)
     
-    ##for each row in the phenotipic data
-    for (i in c(0:nrow(phenodata)))
-    {
-        ##take the name of the ith sample and add ".cov" or ".FPMK"
-        Folders=phenodata[i,1]  
-        Fpkm="FPKM"
-        Cov="cov"
-        TissueCol=paste(Fpkm,Folders,"sep"=".")
-        TissueCov=paste(Cov,Folders,"sep"=".")
-
-        ##If TissueCol is found in the names of the transcripts, sobstitute the name
-        if(TissueCol%in%colnames(Transcripts))
-        {
-            pos<-match(TissueCol,NamesOriginal)
-            tissue<-phenodata[i,2]
-            str_tissue<-paste(Fpkm,toString(tissue),sep=".")
-            NamesOriginal[pos]<-str_tissue
-        }
-
-        ##If TissueCov is found in the names of the transcripts, sobstitute the name	
-        if(TissueCov%in%colnames(transcripts))
-        {
-            pos<-match(TissueCov,NamesOriginal)
-            tissue<-phenodata[i,2]
-            str_tissue<-paste(Cov,toString(tissue),sep=".")
-            NamesOriginal[pos]<-str_tissue
-        }
-        
-
-    }
-    ##returns a vector with the names of the tissues
-    return(NamesOriginal)
-}
-
-PrintHelp<-function()
-{
-    print ("Choose a function asfollow:")
-    print ("1 = Plotter Function")
-    print ("2 = Search by Tissue")
-    print ("3 = Search by gene")
-    print ("4 = Search by gene feature")
-    print ("5 = Search by Differential Fold")
-    print ("6 = Search Coexpression Module")
-    print ("7 = Create Network graph")
-    print ("8 = Differenctial fold for a gene in all tissues")
-    print ("99 = import data from a ballgonw object")
-    stop("No arguments given")
-}
-
-SearchByTissue<-function(Tissue,Name,Transcripts)
-    ##subsets the dataframe to extract only columns reguarding a certain tissue
-{
-    print(Tissue)
-    Name<-toupper(Name)
-    print(Name)
-    ##create FPKM.tissue and OUT.tissue strings
-    paste("Plotting FKPM for tissue ",Tissue)
-    Fpkm="FPKM"
-    Out="OUT"
-
-    TissueCol=paste(Fpkm,Tissue,"sep"=".")
-    ##valutate the value of TissueCol and search it in Transcripts
-    temp<-quote(TissueCol)
-
-    #same with cov
-    Cov="cov"
-    TissueCov=paste(Cov,Tissue,"sep"=".")
-    temp<-quote(TissueCov)
-
-    TranscriptsInfos<-Transcripts[2:10]
-
-    final<-Transcripts[2:10]
-    final$FPKM<-Transcripts[,TissueCol]
-    final$cov<-Transcripts[,TissueCov]
-
-    ##rename the columns
-    colnames(final)<-c("Chromosome","Strand","Start","End","t_name","Num_exons","Length","Gene_ID","Gene_Name","FPKM","Coverage")
+    ##this function results in a table containing the FPKM and cov values for a gene in a specific subset of samples. If no gene name is provided, it prints the values for all the genes in a specific subset of samples or in a specific sample. 
     
-    if (!is.null(Name) & !is.na(Name) & Name!="")
+{
+    bg_subset <-subset(bg, COMBO_CONDITIONS, genomesubset=FALSE)
+    
+    Transcripts<-bg_subset@expr$trans
+    GENE<-toupper(GENE)
+    
+    if (!is.null(GENE))
     {
-
-        if(Name %in% final$Gene_Name)
+        if(GENE %in% Transcripts$gene_id | GENE %in% Transcripts$gene_name)
         {
-            attach(final)
-            final <- final[which(Gene_Name==Name),]
-            detach(final)
+            print(paste("Displaying FKPM and cov values for gene", GENE, "in the sample:", pData(bg_subset)$ids))
+            attach(Transcripts)
+            final <- Transcripts[which(gene_id==GENE | gene_name==GENE),]
+            detach(Transcripts)
         }
         else
-        {
-            stop(sprintf("Can't find gene: %s",Name))
+        {   
+            print(paste("Displaying FKPM and cov values for Samples", pData(bg_subset)$ids))
+            return(Transcripts)
         }  
     }
-        
-    
     return(final)
 }
 
-SearchByGene<-function(Name,Transcripts)
+SearchByGene<-function(GENE,bg)
+    ##subsets the dataframe to extract only lines with a certain gene_name (gene symbol) or gene_id
+    
+{
+    print(paste("Search By Gene", GENE))
+    Transcripts<-bg@expr$trans
+    if(GENE %in% Transcripts$gene_id | GENE %in% Transcripts$gene_name)
+    {
+        id <- unique(Transcripts[which(Transcripts$gene_id==GENE | Transcripts$gene_name==GENE),9])
+        
+        ##vvvv NOT actually needed for genes but its necessary for lowercase
+        ##Name<-toupper(Name)
+        ##Gene<-tolower(GENE)
+        final <- gexpr(bg)[id, ]
+        return(final)
+    } 
+    else 
+    { 
+        print("Invalid Gene Name inserted")
+    }
+    
+}
+
+SearchByTranscript<-function(TRANSCRIPT_ID, bg)
     ##subsets the dataframe to extract only lines with a certain gene_name (gene symbol)
 {
-    print("Search By Gene")
-    Name<-toupper(Name)
-    print(Name)
-
-    ##if the gene is oresente in the column gene_name
-    ##extract the line with the gene and return it
-    if(Name %in% Transcripts$gene_name)
-    {
-        attach(Transcripts)
-        final <- Transcripts[which(gene_name==Name),]
-        detach(Transcripts)
-    }
-    else
-    {
-        stop(sprintf("Can't find gene: %s",Name))
-    }
+    print(paste("Search By Transcript", TRANSCRIPT_ID))
+    total <-bg@expr$trans[,-c(1:5,7:8)]
+    rownames(total)<-total$t_name
+    final<-total[TRANSCRIPT_ID,]
     return(final)
 }
 
-SearchByFeature<-function(Name,Feature,data.fil,Phenodata)
+
+SearchGeneIsoforms<-function(GENE,bg)
+    ##Given a gene id this function prints the expression values for its isoforms (when present). Furthermore, it adds metainformation regarding the genomic coordinates and the nucleotide length.
+{
+    print(paste("Search Isoforms for gene", GENE))
+    total <-bg@expr$trans
+    final<-total[(total$gene_id%in%GENE | total$gene_name %in% GENE),-c(1, 7, 8)]
+    
+    return(final)
+}
+
+
+
+SearchByFeature<-function(GENE,FEATURE,bg)                
     ##subsets the dataframe to extract only lines with a certain gene_name and a certain gene feature (exon or intron)
-    ##data.fil must be input (presents informations about the intron, exon and so on.
 {
     print("Search By Gene Feature")
-    Name<-toupper(Name)
-    print(Name)
-    print(Feature)
     
-    ##the code from search by gene name is repetead 2 times and merged
-    db<-data.fil@expr
-    results=NULL
-    if(Name %in% db$trans$gene_name)
+    print(GENE)
+    print(FEATURE)
+    
+    phenodata<-pData(bg)
+    
+    ##the code from search by gene name is repeated 2 times and merged
+    
+    db<-bg@expr
+    results=NULL                    
+    if(GENE %in% db$trans$gene_name)            
     {
-
-        transcripts <-db$trans
-        attach(transcripts)
-        results <- transcripts[which(gene_name==Name),]
-        detach(transcripts)
-
-        ## I extract the chromosome where is located the gene
-        ##and the start-end position of the gene considered 
+        total <-db$trans
+        results <- total[total$gene_name%in%GENE,]
+        ## I extract the chromosome where is located the gene and the coordinates of the considered gene
         chr_position<-results$chr
         gene_begin<-min(results$start)
         gene_end<-max(results$end)
     }
-    else
-    {
+    else             
+    {                
         print("Not Found")
         result=NaN
     }
-
-    if(Feature=="exon")
+    
+    print("====STARTS SECOND IF====")
+    
+    if(FEATURE=="exon")
     {
         final<-db$exon[which(db$exon$chr==chr_position & db$exon$start >= gene_begin & db$exon$end <= gene_end),]
     }
@@ -188,365 +143,176 @@ SearchByFeature<-function(Name,Feature,data.fil,Phenodata)
     {
         final<-db$intron[which(db$intron$chr==chr_position & db$intron$start >= gene_begin & db$intron$end <= gene_end),]
     }
-
-    ## Change name of the columns
-    ## Other columns to be maintained?
     
+    print("==== FINISH SECOND IF====")
+    ## Change col names
     exclude<-grep("mrcount",colnames(final))
-    final<-final[,-exclude]
-    exclude<-grep("ucount",colnames(final))
-    final<-final[,-exclude]
-
     
-
+    final<-final[,-exclude]            
+    
+    exclude<-grep("ucount",colnames(final))
+    
+    final<-final[,-exclude]            
+    
     NamesOriginal<-colnames(final)
     
-    Tissue_Names <- phenodata[,2]
-    for (i in c(0:nrow(phenodata)))
+    Sample_Names <- phenodata[,2]
+    
+    print("==== STARTS FOR LOOP ====")
+    for(i in c(0:nrow(phenodata)))            
     {
-        Folders=phenodata[i,1]
+        
+        Folders=phenodata[i,1]                
         rcount="rcount"
-        Tissue_RC=paste(rcount,Folders,"sep"=".")
-        if(Tissue_RC%in%colnames(final))
+        Sample_RC=paste(rcount,Folders,"sep"=".")
+        if(Sample_RC%in%colnames(final))
         {
-            pos<-match(Tissue_RC,NamesOriginal)
-            tissue <- phenodata[i,2]
-            str_tissue <- paste("Read Count",toString(tissue),sep=" ")
-            NamesOriginal[pos] <- str_tissue
+            pos<-match(Sample_RC,NamesOriginal)
+            sample<- phenodata[i,2]
+            str_sample <- paste("Read Count",toString(sample),sep=" ")
+            
+            NamesOriginal[pos]<- str_sample
         }
     }
     colnames(final)<-NamesOriginal
     return(final)
 }
 
-SearchByDiffFoldExpr<-function(Tissue1,Tissue2,Name,Transcripts)
-    ##subsets the dataframe to extract only 2 tissues and confront their expression (fold expression)
+
+SearchByDiffFoldExpr<-function(COMBO_CONDITIONS, COVARIATE, FEATURE, bg)
 {
-    print("Search By Differential Expression")
-    print(Tissue1)
-    print(Tissue2)
-    Name<-toupper(Name)
-    print(Name)
+    ##ipotesi di due o più variabili che arrivano già in questo formato dall'utente per il subsetting (ad esempio COMBO_CONDITIONS='time_h==336 & treatment=="Irradiated"'):
     
-    ##Extract FPKM values from the tissues 
-    Fpkm="FPKM"
-    Out="OUT"
-    TissueCol1=paste(Fpkm,Tissue1,"sep"=".")
-    TissueCol2=paste(Fpkm,Tissue2,"sep"=".")
-
-    temp1<-quote(TissueCol1)
-    temp2<-quote(TissueCol2)
+    bg_subset <-subset(bg,COMBO_CONDITIONS, genomesubset=FALSE)
+    bg_filt<-subset(bg_subset,"rowVars(texpr(bg))>1",genomesubset=TRUE)
     
-    TransFpkm1<-Transcripts[,eval(temp1)]
-    TransFpkm2<-Transcripts[,eval(temp2)]
-
-    ##Add covariance column
-
-    Cov="cov"
-    TissueCol1=paste(Cov,Tissue1,sep=".")
-    TissueCol2=paste(Cov,Tissue2,sep=".")
-
-    temp1<-quote(TissueCol1)
-    temp2<-quote(TissueCol2)
+    ##Saving some metainformation:
+    details_trans <-bg_filt@expr$trans[,c(1:10)]
+    details_exon <-bg_filt@expr$exon[,c(1:5)] 
+    details_intron <- bg_filt@expr$intron[,c(1:5)]
     
-    TransCov1<-Transcripts[,eval(temp1)]
-    TransCov2<-Transcripts[,eval(temp2)]
-
-    ##Creating a data table containing only the columns needed
     
-    LittleData<-Transcripts[,c(6,10)]
-    LittleData[,3]<-TransCov1
-    LittleData[,4]<-TransCov2
-
-    colnames(LittleData)<-c("ID","Gene_Name",Tissue1,Tissue2)
-
-    if (!is.null(Name) && !is.na(Name) && Name!="")
+    if(FEATURE=="transcript") 
     {
-        print(!is.null(Name))
-        print(!is.na(Name))
-        print(Name)
-    }
-    
-    if (!is.na(Name) & !is.null(Name) & Name!="")
-    {
-        if(Name %in% LittleData$Gene_Name)
-        {
-            attach(LittleData)
-            LittleData <- LittleData[which(Gene_Name==Name),]
-            detach(LittleData)
-            #final<-results
-        }
-        else
-        {
-            stop(sprintf("Can't find gene: %s",Name))
-        }  
-    }
-
-    ##add a little value to avoid 0 on denominators
-    LittleData[,3]<-LittleData[c(0:nrow(LittleData)),3]+0.000001
-    LittleData[,4]<-LittleData[c(0:nrow(LittleData)),4]+0.000001
-
-    ##Calculate fold changes (both normal and logarithmyc values)
-    LittleData$"FoldChanges"
-    LittleData$"Log2FoldChanges"
-    for(line in c(0:nrow(LittleData)))
-    {
-        FC=(LittleData[line,Tissue1]/LittleData[line,Tissue2])
-        LittleData[line,"FoldChanges"]=FC       
+        stats <- stattest(bg_filt, feature=FEATURE, meas='FPKM', covariate=COVARIATE, getFC=T)
+        ##adding metainfo and sorting by qvalue:
+        final_stats <- arrange(merge(stats, details_trans, by.x=2, by.y=1, all.x=T, all.y=F), qval)
         
-        Log2FC=log2(FC)
-        LittleData[line,"Log2FoldChanges"]=Log2FC       
+        ##rearranging columns to show:
+        return(final_stats[,c(10,14,3:9,11,12)])
     }
+    else if(FEATURE=="gene") 
+    {    
+        stats <- stattest(bg_filt, feature=FEATURE, meas='FPKM', covariate=COVARIATE, getFC=T)
+        
+        final <- arrange(stats,qval)
+        return(final[,c(2:5)])
+    }
+    else if(FEATURE=="exon")
+    {
+        stats <- stattest(bg_filt, feature=FEATURE, covariate=COVARIATE, getFC=T)
+        final <- arrange(merge(stats,details_exon, by.x=2, by.y=1, all.x=T, all.y=F),qval)
+        return(final[,c(2:9)])
+    }
+    else if(FEATURE=="intron")
+    {
+        stats <- stattest(bg_filt, feature=FEATURE, meas='rcount', covariate=COVARIATE, getFC=T)
+        final <- arrange(merge(stats,details_intron, by.x=2, by.y=1, all.x=T, all.y=F),qval)
+        return(final[,c(2:9)])
+    }
+}
+
+StatsFiltering<-function(STATS, Q_THRESHOLD=0.05, P_THRESHOLD=0.05, MIN_FOLD_CHANGE=2)
+{
+    ##Remove NAs:                                                                                                                                         
+    stats_without_na <- STATS[!is.na(STATS$pval), ]
     
-    return(LittleData)
+    ##Print some summary stats:                                                                                                                           
+    p.val_filtering <- sum(stats_without_na$pval< P_THRESHOLD)
+    q.val_filtering <- sum(stats_without_na$qval< Q_THRESHOLD)
+    fc_filtering <- sum(stats_without_na$fc> log2(MIN_FOLD_CHANGE + 1) | stats_without_na$fc< log2((1/MIN_FOLD_CHANGE)+1))
+    combination_of_filters <- sum(stats_without_na$pval< P_THRESHOLD & stats_without_na$qval< Q_THRESHOLD & stats_without_na$fc> log2(MIN_FOLD_CHANGE + 1) | stats_without_na$fc< log2((1/MIN_FOLD_CHANGE)+1))
+    
+    pval_string<-paste("There are",p.val_filtering,"entries satisfying the desired p-value threshold",sep=" " )
+    qval_string<-paste("There are",q.val_filtering,"entries satisfying the desired q-value threshold",sep=" " )
+    fc_string<-paste("There are",fc_filtering,"entries satisfying the desired fold change threshold",sep=" " )
+    combination_filters_string<-paste("There are", combination_of_filters, "entries satisfying the desired combination of fold change, p-value and q-value thresholds",sep=" " )
+    
+    print(pval_string)
+    print(qval_string)
+    print(fc_string)
+    print(combination_filters_string)
+    
+    ##filter and show the data frame with the specified thresholds of interest:                                                                           
+    filt_stats_table <- stats_without_na[(stats_without_na$pval< P_THRESHOLD & stats_without_na$qval< Q_THRESHOLD & (stats_without_na$fc > log2(MIN_FOLD_CHANGE +1) | stats_without_na$fc <log2(1/MIN_FOLD_CHANGE)+1)) ,]
+    
+    return(filt_stats_table)
+}
+
+getGenes<-function(bg)
+{
+    names<-geneNames(bg)
+    return(names)
+}
+
+getTranscrip<-function(bg)
+{
+    names<-transcriptNames(bg)
+    return(names)
 }
 
 
-SearchTranscriptGroup<-function(query_type,Name,ModulesFile,Transcripts)
+Gene_Plotter_By_Group<-function(GENE, MEAS="FPKM", GROUPVAR=NULL, BASEDIR=getwd(),bg)
 {
-    ##Name: gene name to be analyzed (es gene77) or gene symbol (es STK33)
-    ##ModulesFile: file containig informations about coexpression
-    ##modules (TOM files from WGCNA pipeline)
-
-    load(ModulesFile)
+    ##plots all transcripts relative to a single gene grouped by a covariate (a colname of pData(bg)).
     
-    if(query_type=="symbol")
+    if(is.null(GROUPVAR))
     {
-        #all gene symbols are upper cases
-        Name<-toupper(Name)
-
-        colnames(datExpr)<-as.character(Transcripts[match(colnames(datExpr),transcripts$gene_id),]$gene_name)
-        pos<-match(Name,colnames(datExpr))
-    }
-
-    ##probably redundant
-    if(query_type=="gene_name")
-    {
-        pos<-match(Name,colnames(datExpr))
+        stop("Covariate variable is not defined")
     }
     
+    ##vvvv add random string from stringi package?vvvv
+    file_hash<-paste(format(Sys.time(), "%d%H%M%s"))
+    ##^^^^ add random string from stringi package?^^^^
     
+    gene<-toupper(GENE)
+    out_file_1 <- paste(GENE, MEAS, GROUPVAR, file_hash,"png", sep=".")
+    out_file_2 <- paste(BASEDIR,out_file_1,sep="/")
+    
+    png(out_file_1,width=1080,height=720)
+    
+    par(mar = rep(2, 4))    
+    plotMeans(gene,bg, meas=MEAS, groupvar=GROUPVAR)
+    
+    dev.off()    
+    return(0)
+}
+
+
+SearchTranscriptGroup<-function(NAME,MODULESFILE,bg)
+{
+    ##function returns the genes belonging to the same expression module as the gene of interest.     
+    
+    ##MODULESFILE: file containig informations about coexpression                                                                                     
+    ##modules (TOM files from WGCNA pipeline)                                                                                                         
+    ##It's the file OK_Gene_Modules.Rdata obtainde with coexpression.R                                                                                
+    
+    load(MODULESFILE)
+    
+    transcripts<-bg@expr$trans
+    
+    ##vvvvfind the position of the gene in the Expression Data                                                                                        
+    
+    pos<-match(NAME,colnames(datExpr))
     geneModule<-moduleLabels[pos]
-
-    ##extracting all genes belongin to the module
+    
+    ## datExpr is an object included in MODULESFILE and contains the                                                                                  
+    ## expression information                                                                                                                         
+    ##^^^^find the position of the gene in the Expression Data                                                                                        
+    
+    ##extracting all genes belonging to the module                                                                                                    
     Gene_Module<-names(datExpr)[moduleLabels==geneModule]
-
-    if(query_type=="symbol")
-    {
-        subsetted<-transcripts[transcripts$gene_name %in% Gene_Module,]
-    }
-
-    if(query_type=="gene_name")
-    {
-        subsetted<-transcripts[transcripts$gene_id %in% Gene_Module,]
-    }
-            
+    subsetted<-transcripts[transcripts$gene_id %in% Gene_Module,]
+    
     return(subsetted[,c(1:10)])
-}
-
-Network<-function(query_type,query,MODULES,Transcripts,corr,results)
-{
-    ##file hash for output
-    File_Hash<-paste(format(Sys.time(), "%Y%m%d%H%M"),"png",sep=".")
-    
-    ## == Sanity checks ==
-    if(query_type!="gene_name" & query_type!="symbol")
-    {
-        print("Choose between 'gene_name' and 'symbol'")
-        stop("Argument 1 not recognized")
-    }
-
-    if(file.exists(MODULES))
-    {
-        load(MODULES)
-    }else{
-        print("File not found. Makes sure that the file containing the modules is correct")
-    }
-    
-    ##== END ==
-
-    ## == Default vaules of correlation and number of results ==
-    if(length(corr)==0)
-    {
-        corr=0.9
-    }
-
-    if(length(results)==0)
-    {
-        results=50
-    }
-    ## == End of Defaults ==
-
-    ## importing transcripts data
-    
-    ##== The query is the gene symbol or gene name? ==
-    
-    if(query_type=="symbol")
-    {
-        #all gene symbols are upper cases
-        query<-toupper(query)
-        
-        colnames(datExpr)<-as.character(transcripts[match(colnames(datExpr),transcripts$gene_id),]$gene_name)
-
-        query_position<-match(query,colnames(datExpr))
-        query_module<-moduleLabels[query_position]
-    }
-
-    ## probably redundant
-    if(query_type=="gene_name")
-    {
-        query_position<-match(query,colnames(datExpr))
-        query_module<-moduleLabels[query_position]
-    }
-
-    ##== END ==
-
-    module_line<-which(moduleLabels %in% query_module)
-    datExpr_module<-datExpr[,module_line]
-
-    A<-cor(datExpr_module)
-    print("Correlation matrix created")
-    colnames(A)
-
-    diag(A)<-0
-    A[abs(A)<corr]=0
-
-    row_col=match(query,colnames(A))
-    cor_vec=abs(A[,row_col])
-    C<-names(sort(abs(A[,row_col]),decreasing=TRUE)[c(0:results)])
-
-    if(query%in%C){
-        print("Query gene is in C")
-    }else{
-        C[results]<-query
-    }
-    D<-A[C,C]
-
-    ##D/40 to stress distances between nodes
-    D<-D/40
-
-    print("Create graph")
-    
-    if(query_type=="symbol")
-    {
-        graph<-graph_from_adjacency_matrix(D,mode="max",weighted=TRUE,diag=FALSE)
-
-        graph<-simplify(graph)
-
-        
-        V(graph)$color<-"white"
-        V(graph)[query]$color<-"red"
-
-        out_file=paste("Network",query,File_Hash,sep="_")
-        ##plotting
-        ## png(out_file,width=1080,heigh=720)
-        plot(graph)
-        ##                                 #plot(graph,vertex.shape="vrectangle")
-        ## dev.off()
-    }
-    
-    if(query_type=="gene_name")
-    {
-
-        graph<-graph_from_adjacency_matrix(D,mode="max",weighted=TRUE,diag=FALSE)
-            
-        V(graph)$gene=as.character(transcripts[match(C,transcripts$gene_id),]$gene_name)
-        #V(graph)$gene=as.character(transcripts[match(C,transcripts$t_name),]$gene_name)
-        coul=rainbow(n=length(V(graph)$gene))
-        my_color=coul[as.numeric(as.factor(V(graph)$gene))]
-        
-        V(graph)$color<-"white"
-        V(graph)[query]$color<-"red"
-        V(graph)$shape<-"vrectangle"
-        graph<-simplify(graph)
-
-        ##plotting
-
-        out_file=paste("Network",query,File_Hash,sep="_")
-        
-        ##png(out_file,width=1080,heigh=720)
-        
-        plot(graph, vertex.shape="vrectangle", vertex.label.color=my_color,label.degree="-p/2")
-        
-        cols=2
-        print("Fixing Legend")
-        if(length(C)>70)
-        {
-            cols=3
-            
-        }else{
-            cols=2
-        }
-        legend(x=-2,y=0.8,legend=levels(as.factor(V(graph)$gene)),
-               col = coul ,
-               bty = "n",
-               pch=20 ,
-               pt.cex = 3,
-               cex = 1,
-               text.col=coul,
-               horiz = FALSE,
-               ncol=cols,
-               inset = c(0.1, 0.1))
-        ##dev.off()
-    }
-    
-    return(graph)
-}
-
-
-GeneFoldTissue<-function(Name,TissueRef,Transcripts)
-##subsets the dataframe to extract only 2 tissues and confront their expression (fold expression)
-{
-    print("Search By Differential of a gene")
-    Name<-toupper(Name)
-    print(Name)
-    gsub(" ",".",TissueRef)
-    TissueRef<-tolower(TissueRef)
-    print(TissueRef)
-
-    FPKM_ONLY<-transcripts[,grep("FPKM",colnames(transcripts))]    
-    FPKM_ONLY$gene_name<-transcripts$gene_name
-    FPKM_ONLY$t_name<-transcripts$t_name
-
-    GENE_FPKM<-FPKM_ONLY[which(FPKM_ONLY$gene_name %in% Name),]
-    GN<-GENE_FPKM$gene_name
-    TN<-GENE_FPKM$t_name
-
-    ##GENE_FPKM<-GENE_FPKM[,c(1:length(colnames(GENE_FPKM))-2)]
-    GENE_FPKM<-GENE_FPKM[,c(1:30)]
-    
-    ##add a little value to avoid 0 on denominators	
-    GENE_FPKM<-GENE_FPKM+0.00001
-    GENE_FPKM$gene_name<-GN
-    GENE_FPKM$t_name<-TN
-
-    ## the median of the mean values of transcritption guarantee that
-    ## oviduct is a pretty "average" tissue
-    ##ref<-GENE_FPKM$FPKM.oviduct
-    TissueFpkm=paste("FPKM",TissueRef,"sep"=".")
-
-    ref=tryCatch(GENE_FPKM[,TissueFpkm],
-        error=function(e){
-            stop("Tissue not found, check the spelling")
-        }
-    )
-
-    
-    
-    ##fold change (logarithmic)
-    FC=log2(GENE_FPKM[,c(1:29)]/ref)		
-    FC$gene_name<-GENE_FPKM$gene_name
-    FC$t_name<-GENE_FPKM$t_name
-    
-    names_ok<-gsub("FPKM.","",colnames(FC))
-    colnames(FC)<-names_ok
-    
-    FC_COL<-c(length(colnames(FC))-1,length(colnames(FC)))
-    FOLD_COLS<-length(colnames(FC))-2
-    FC_COL<-c(FC_COL,c(1:FOLD_COLS))
-    
-    FC<-FC[,FC_COL]
-
-    print(FC)
-    return(FC)
 }

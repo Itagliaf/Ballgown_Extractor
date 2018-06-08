@@ -1,87 +1,4 @@
 library(ballgown)	
-## Plotter<-function(Genes,Transcripts)
-##     ##from a vector of genes creates a table and a histogram
-## {
-##                                         #lapply(Genes,toupper())
-##     Genes<-toupper(Genes)
-##     print(Genes)
-    
-##     Transcripts_FPKM<-Transcripts[,grep("FPKM",colnames(Transcripts))]
-##     Transcripts_FPKM$gene_name<-Transcripts$gene_name
-##     subsetted=NULL
-    
-##     for (gene in Genes)
-##     {
-##         temp<-subset(Transcripts_FPKM,Transcripts_FPKM$gene_name==gene)
-##         subsetted<-rbind(subsetted,temp)	
-##     }
-##     subsetted_ok=NULL
-
-##     for (gene in Genes)
-##     {
-##         if (length(grep(gene,subsetted$gene_name)>1))
-##         {
-##             multiple<-subsetted[grep(gene,subsetted$gene_name,),]
-##             mean_vec<-apply(multiple[,-ncol(multiple)],2,mean)
-##             ##mean_vec$gene_nane
-##             ##mean_vec
-##             subsetted_ok<-rbind(subsetted_ok,mean_vec)
-##         }
-##         else
-##         {
-##             subsetted_ok<-rbind(subsetted_ok,subsetted[grep(gene,subsetted$gene_name,),-ncol(subsetted)])
-##         }
-##     }
-##     subsetted<-subsetted_ok
-##     ##subsetted$gene_name<-Genes
-##     row.names(subsetted)<-Genes
-##     colnames(subsetted)<-gsub("FPKM.","",colnames(subsetted))
-##     colnames(subsetted)<-gsub("\\."," ",colnames(subsetted))
-
-##     if (length(Genes)==1)
-##     {
-##         print("subsetted is ok")
-##     }
-##     else
-##     {
-##         subsetted<-subsetted[,-ncol(subsetted)]
-##         subsetted<-as.data.frame(subsetted)
-##     }
-##     tsubsetted<-t(subsetted)
-
-##     row.names(tsubsetted)<-colnames(subsetted)
-
-##     tsubsetted<-as.data.frame(tsubsetted)
-##     tsubsetted$tissue<-row.names(tsubsetted)
-    
-##     for (gene in Genes)
-##     {
-##         out_file <- paste(gene,"png",sep=".")
-##         ylab_ok <- paste(gene,"(FPKM)",sep=" ")
-        
-##         #print(tsubsetted)
-##         if (length(Genes)==1)
-##         {
-##             df2<-tsubsetted
-##         }
-##         else
-##         {
-##             df2 <- tsubsetted[,c(gene, "tissue")]
-##         }
-##         print(gene)
-##         p<-ggplot(data=df2)+
-##             geom_bar(stat="identity",aes_string(x="tissue",y=gene,fill="tissue"))+
-##             theme_minimal()+
-##             labs(x="TISSUE",y=ylab_ok)+
-##             theme(axis.text.x=element_text(angle=75,vjust=0.5,size=15))+
-##             theme(axis.title.x=element_text(size=15))+
-##             theme(axis.text.y=element_text(size=15))+
-##             theme(axis.title.y=element_text(size=15))+
-##             theme(legend.position="none")
-        
-##     }
-##     return(p)
-## }
 Plotter2<-function(gene,Data.Fil)
 {
     ##plots all transcripts realtive to a single gene relatively to all tissues
@@ -577,13 +494,16 @@ Network<-function(query_type,query,MODULES,Transcripts,corr,results)
 }
 
 
-GeneFoldTissue<-function(Name,Transcripts)
+GeneFoldTissue<-function(Name,TissueRef,Transcripts)
 ##subsets the dataframe to extract only 2 tissues and confront their expression (fold expression)
 {
     print("Search By Differential of a gene")
     Name<-toupper(Name)
     print(Name)
-    
+    gsub(" ",".",TissueRef)
+    TissueRef<-tolower(TissueRef)
+    print(TissueRef)
+
     FPKM_ONLY<-transcripts[,grep("FPKM",colnames(transcripts))]    
     FPKM_ONLY$gene_name<-transcripts$gene_name
     FPKM_ONLY$t_name<-transcripts$t_name
@@ -602,8 +522,17 @@ GeneFoldTissue<-function(Name,Transcripts)
 
     ## the median of the mean values of transcritption guarantee that
     ## oviduct is a pretty "average" tissue
-    ref<-GENE_FPKM$FPKM.oviduct
+    ##ref<-GENE_FPKM$FPKM.oviduct
+    TissueFpkm=paste("FPKM",TissueRef,"sep"=".")
 
+    ref=tryCatch(GENE_FPKM[,TissueFpkm],
+        error=function(e){
+            stop("Tissue not found, check the spelling")
+        }
+    )
+
+    
+    
     ##fold change (logarithmic)
     FC=log2(GENE_FPKM[,c(1:29)]/ref)		
     FC$gene_name<-GENE_FPKM$gene_name
