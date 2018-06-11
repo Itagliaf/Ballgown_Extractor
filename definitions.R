@@ -318,3 +318,100 @@ SearchTranscriptGroup<-function(NAME,MODULESFILE,bg)
     
     return(subsetted[,c(1:10)])
 }
+
+Network<-function(QUERY,MODULES,corr=0.9,results=50,bg)
+{
+    load(bg)
+    Transcripts=bg@expr$trans
+
+    ##file hash for output
+    File_Hash<-paste(format(Sys.time(), "%d%H%M"),"png",sep=".")
+
+    if(file.exists(MODULES))
+    {
+        load(MODULES)
+    }else{
+        print("File not found. Makes sure that the file containing the modules is correct")
+    }
+
+    ##== END ==
+
+    QUERY_position<-match(QUERY,colnames(datExpr))
+    QUERY_module<-moduleLabels[QUERY_position]
+
+
+    module_line<-which(moduleLabels %in% QUERY_module)
+    datExpr_module<-datExpr[,module_line]
+
+    Corr_Genes<-cor(datExpr_module)
+    print("Correlation matrix created")
+    colnames(Coor_Genes)
+
+    diag(Coor_Genes)<-0
+    Coor_Genes[abs(Coor_Genes)<corr]=0
+
+    row_col=match(QUERY,colnames(Coor_Genes))
+    cor_vec=abs(Coor_Genes[,row_col])
+    C<-names(sort(abs(Coor_Genes[,row_col]),decreasing=TRUE)[c(0:results)])
+
+    if(QUERY%in%C){
+        print("QUERY gene is in C")
+    }else{
+        C[results]<-QUERY
+    }
+    D<-Coor_Genes[C,C]
+
+    ##D/40 to stress distances between nodes
+    D<-D/40
+
+    print("Create graph")
+
+    if(QUERY_type=="gene_name")
+    {
+
+        graph<-graph_from_adjacency_matrix(D,mode="max",weighted=TRUE,diag=FALSE)
+
+        V(graph)$gene=as.character(transcripts[match(C,transcripts$gene_id),]$gene_name)
+        #V(graph)$gene=as.character(transcripts[match(C,transcripts$t_name),]$gene_name)
+        coul=rainbow(n=length(V(graph)$gene))
+        my_color=coul[as.numeric(as.factor(V(graph)$gene))]
+
+        V(graph)$color<-"white"
+        V(graph)[QUERY]$color<-"red"
+        V(graph)$shape<-"vrectangle"
+        graph<-simplify(graph)
+
+        ##plotting
+
+        out_file=paste("Network",QUERY,File_Hash,sep="_")
+
+        ##png(out_file,width=1080,heigh=720)
+
+        plot(graph, vertex.shape="vrectangle", vertex.label.color=my_color,label.degree="-p/2")
+
+        cols=2
+        print("Fixing Legend")
+        if(length(C)>70)
+        {
+            cols=3
+
+        }else{
+            cols=2
+        }
+        legend(x=-2,y=0.8,legend=levels(as.factor(V(graph)$gene)),
+               col = coul ,
+               bty = "n",
+               pch=20 ,
+               pt.cex = 3,
+               cex = 1,
+               text.col=coul,
+               horiz = FALSE,
+               ncol=cols,
+               inset = c(0.1, 0.1))
+        ##dev.off()
+    }
+
+    return(graph)
+}
+
+
