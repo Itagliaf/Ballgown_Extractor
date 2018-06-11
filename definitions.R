@@ -252,7 +252,9 @@ StatsFiltering<-function(STATS, Q_THRESHOLD=0.05, P_THRESHOLD=0.05, MIN_FOLD_CHA
 getGenes<-function(bg)
 {
     names<-geneNames(bg)
-    return(names)
+    ids <- geneIDs(bg)
+    genes <- unique(cbind(names,ids))
+    return(genes)
 }
 
 getTranscrip<-function(bg)
