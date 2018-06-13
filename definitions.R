@@ -293,12 +293,13 @@ Gene_Plotter_By_Group<-function(GENE, MEAS="FPKM", GROUPVAR=NULL, BASEDIR=getwd(
 
 SearchTranscriptGroup<-function(NAME,MODULESFILE,bg)
 {
+    ##!!! IGRAPH LIBRARY NEEDED !!!
+    
     ##function returns the genes belonging to the same expression module as the gene of interest.     
     
     ##MODULESFILE: file containig informations about coexpression                                                                                     
     ##modules (TOM files from WGCNA pipeline)                                                                                                         
     ##It's the file OK_Gene_Modules.Rdata obtainde with coexpression.R                                                                                
-    
     load(MODULESFILE)
     
     transcripts<-bg@expr$trans
@@ -365,47 +366,47 @@ Network<-function(QUERY,MODULES,bg,CORR=0.9,RESULTS=50,BASEDIR=getwd())
 
     print("Create graph")
 
-        graph<-graph_from_adjacency_matrix(D,mode="max",weighted=TRUE,diag=FALSE)
+    graph<-graph_from_adjacency_matrix(D,mode="max",weighted=TRUE,diag=FALSE)
+    
+    V(graph)$gene=as.character(Transcripts[match(C,Transcripts$gene_id),]$gene_name)
+                                       
+    coul=rainbow(n=length(V(graph)$gene))
+    my_color=coul[as.numeric(as.factor(V(graph)$gene))]
 
-        V(graph)$gene=as.character(Transcripts[match(C,Transcripts$gene_id),]$gene_name)
-        #V(graph)$gene=as.character(Transcripts[match(C,Transcripts$t_name),]$gene_name)
-        coul=rainbow(n=length(V(graph)$gene))
-        my_color=coul[as.numeric(as.factor(V(graph)$gene))]
+    V(graph)$color<-"white"
+    V(graph)[QUERY]$color<-"red"
+    V(graph)$shape<-"vrectangle"
+    graph<-simplify(graph)
 
-        V(graph)$color<-"white"
-        V(graph)[QUERY]$color<-"red"
-        V(graph)$shape<-"vrectangle"
-        graph<-simplify(graph)
+    ##plotting
+    
+    out_file_1<-paste("Network",QUERY,File_Hash,sep="_")
+    out_file_2<-paste(BASEDIR,out_file_1,sep="/")
+    
+    png(out_file_2,width=1080,heigh=720)
 
-        ##plotting
+    plot(graph, vertex.shape="vrectangle", vertex.label.color=my_color,label.degree="-p/2")
+    
+    cols=2
+    print("Fixing Legend")
+    if(length(C)>70)
+    {
+        cols=3
 
-        out_file_1<-paste("Network",QUERY,File_Hash,sep="_")
-	out_file_2<-paste(BASEDIR,out_file_1,sep="/")
-
-        png(out_file_2,width=1080,heigh=720)
-
-        plot(graph, vertex.shape="vrectangle", vertex.label.color=my_color,label.degree="-p/2")
-
+    }else{
         cols=2
-        print("Fixing Legend")
-        if(length(C)>70)
-        {
-            cols=3
-
-        }else{
-            cols=2
-        }
-        legend(x=-2,y=0.8,legend=levels(as.factor(V(graph)$gene)),
-               col = coul ,
-               bty = "n",
-               pch=20 ,
-               pt.cex = 3,
-               cex = 1,
-               text.col=coul,
+    }
+    legend(x=-2,y=0.8,legend=levels(as.factor(V(graph)$gene)),
+           col = coul ,
+           bty = "n",
+           pch=20 ,
+           pt.cex = 3,
+           cex = 1,
+           text.col=coul,
                horiz = FALSE,
-               ncol=cols,
-               inset = c(0.1, 0.1))
-        dev.off()
+           ncol=cols,
+           inset = c(0.1, 0.1))
+    dev.off()
 
 
     return(graph)
