@@ -321,7 +321,6 @@ SearchTranscriptGroup<-function(NAME,MODULESFILE,bg)
 
 Network<-function(QUERY,MODULES,corr=0.9,results=50,bg)
 {
-    load(bg)
     Transcripts=bg@expr$trans
 
     ##file hash for output
@@ -345,29 +344,28 @@ Network<-function(QUERY,MODULES,corr=0.9,results=50,bg)
 
     Corr_Genes<-cor(datExpr_module)
     print("Correlation matrix created")
-    colnames(Coor_Genes)
+    colnames(Corr_Genes)
 
-    diag(Coor_Genes)<-0
-    Coor_Genes[abs(Coor_Genes)<corr]=0
+    diag(Corr_Genes)<-0
+    Corr_Genes[abs(Corr_Genes)<corr]=0
 
-    row_col=match(QUERY,colnames(Coor_Genes))
-    cor_vec=abs(Coor_Genes[,row_col])
-    C<-names(sort(abs(Coor_Genes[,row_col]),decreasing=TRUE)[c(0:results)])
+    row_col=match(QUERY,colnames(Corr_Genes))
+    cor_vec=abs(Corr_Genes[,row_col])
+    C<-names(sort(abs(Corr_Genes[,row_col]),decreasing=TRUE)[c(0:results)])
 
     if(QUERY%in%C){
         print("QUERY gene is in C")
     }else{
         C[results]<-QUERY
     }
-    D<-Coor_Genes[C,C]
+    D<-Corr_Genes[C,C]
 
     ##D/40 to stress distances between nodes
     D<-D/40
 
     print("Create graph")
 
-    if(QUERY_type=="gene_name")
-    {
+    
 
         graph<-graph_from_adjacency_matrix(D,mode="max",weighted=TRUE,diag=FALSE)
 
@@ -409,7 +407,7 @@ Network<-function(QUERY,MODULES,corr=0.9,results=50,bg)
                ncol=cols,
                inset = c(0.1, 0.1))
         ##dev.off()
-    }
+
 
     return(graph)
 }
