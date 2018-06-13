@@ -2,7 +2,7 @@ library(ballgown)
 library(dplyr)
 library(genefilter)
 
-lotter2<-function(GENE, MEAS="FPKM", SAMPLES=pData(bg)$ids,BASEDIR=getwd(), bg)
+Plotter2<-function(GENE, MEAS="FPKM", SAMPLES=pData(bg)$ids,BASEDIR=getwd(), bg)
 {
     ##plots all transcripts relative to a single gene relatively to all tissues.
     
@@ -319,18 +319,18 @@ SearchTranscriptGroup<-function(NAME,MODULESFILE,bg)
     return(subsetted[,c(1:10)])
 }
 
-Network<-function(QUERY,MODULES,corr=0.9,results=50,bg)
+Network<-function(QUERY,MODULES,bg,CORR=0.9,RESULTS=50,BASEDIR=getwd())
 {
     Transcripts=bg@expr$trans
 
     ##file hash for output
-    File_Hash<-paste(format(Sys.time(), "%d%H%M"),"png",sep=".")
+    file_hash<-paste(format(Sys.time(),"%d%H%M%s"))
 
     if(file.exists(MODULES))
     {
         load(MODULES)
     }else{
-        print("File not found. Makes sure that the file containing the modules is correct")
+        print("File not found. Makes sure that the file containing the modules is CORRect")
     }
 
     ##== END ==
@@ -342,35 +342,33 @@ Network<-function(QUERY,MODULES,corr=0.9,results=50,bg)
     module_line<-which(moduleLabels %in% QUERY_module)
     datExpr_module<-datExpr[,module_line]
 
-    Corr_Genes<-cor(datExpr_module)
-    print("Correlation matrix created")
-    colnames(Corr_Genes)
+    CORR_Genes<-cor(datExpr_module)
+    print("CORRelation matrix created")
+    colnames(CORR_Genes)
 
-    diag(Corr_Genes)<-0
-    Corr_Genes[abs(Corr_Genes)<corr]=0
+    diag(CORR_Genes)<-0
+    CORR_Genes[abs(CORR_Genes)<CORR]=0
 
-    row_col=match(QUERY,colnames(Corr_Genes))
-    cor_vec=abs(Corr_Genes[,row_col])
-    C<-names(sort(abs(Corr_Genes[,row_col]),decreasing=TRUE)[c(0:results)])
+    row_col=match(QUERY,colnames(CORR_Genes))
+    cor_vec=abs(CORR_Genes[,row_col])
+    C<-names(sort(abs(CORR_Genes[,row_col]),decreasing=TRUE)[c(0:RESULTS)])
 
     if(QUERY%in%C){
         print("QUERY gene is in C")
     }else{
-        C[results]<-QUERY
+        C[RESULTS]<-QUERY
     }
-    D<-Corr_Genes[C,C]
+    D<-CORR_Genes[C,C]
 
     ##D/40 to stress distances between nodes
     D<-D/40
 
     print("Create graph")
 
-    
-
         graph<-graph_from_adjacency_matrix(D,mode="max",weighted=TRUE,diag=FALSE)
 
-        V(graph)$gene=as.character(transcripts[match(C,transcripts$gene_id),]$gene_name)
-        #V(graph)$gene=as.character(transcripts[match(C,transcripts$t_name),]$gene_name)
+        V(graph)$gene=as.character(Transcripts[match(C,Transcripts$gene_id),]$gene_name)
+        #V(graph)$gene=as.character(Transcripts[match(C,Transcripts$t_name),]$gene_name)
         coul=rainbow(n=length(V(graph)$gene))
         my_color=coul[as.numeric(as.factor(V(graph)$gene))]
 
@@ -381,9 +379,10 @@ Network<-function(QUERY,MODULES,corr=0.9,results=50,bg)
 
         ##plotting
 
-        out_file=paste("Network",QUERY,File_Hash,sep="_")
+        out_file_1<-paste("Network",QUERY,File_Hash,sep="_")
+	out_file_2<-paste(BASEDIR,out_file_1,sep="/")
 
-        ##png(out_file,width=1080,heigh=720)
+        png(out_file_2,width=1080,heigh=720)
 
         plot(graph, vertex.shape="vrectangle", vertex.label.color=my_color,label.degree="-p/2")
 
@@ -406,7 +405,7 @@ Network<-function(QUERY,MODULES,corr=0.9,results=50,bg)
                horiz = FALSE,
                ncol=cols,
                inset = c(0.1, 0.1))
-        ##dev.off()
+        dev.off()
 
 
     return(graph)
