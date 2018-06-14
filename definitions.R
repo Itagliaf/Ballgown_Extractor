@@ -257,12 +257,16 @@ getGenes<-function(bg)
     return(genes)
 }
 
-getTranscrip<-function(bg)
+getTranscript<-function(bg)
 {
     names<-transcriptNames(bg)
     return(names)
 }
 
+getCovariates<-function(bg)
+{
+	return(pData(bg))
+}
 
 Gene_Plotter_By_Group<-function(GENE, MEAS="FPKM", GROUPVAR=NULL, BASEDIR=getwd(),bg)
 {
