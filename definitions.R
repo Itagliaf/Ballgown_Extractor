@@ -187,9 +187,12 @@ SearchByDiffFoldExpr<-function(COMBO_CONDITIONS, COVARIATE, FEATURE, bg)
     bg_filt<-subset(bg_subset,"rowVars(texpr(bg))>1",genomesubset=TRUE)
     
     ##Saving some metainformation:
-    details_trans <-bg_filt@expr$trans[,c(1:10)]
-    details_exon <-bg_filt@expr$exon[,c(1:5)] 
-    details_intron <- bg_filt@expr$intron[,c(1:5)]
+    details_trans <-bg_filt@expr$trans[,c(0:10)]
+
+    ## Exclude the t_name, num_exons, length in intro and exon
+    details_exon <-bg_filt@expr$trans[,c(0:5,9,10)]	
+    details_intron <-bg_filt@expr$trans[,c(0:5,9,10)]
+
     
     
     if(FEATURE=="transcript") 
@@ -212,13 +215,14 @@ SearchByDiffFoldExpr<-function(COMBO_CONDITIONS, COVARIATE, FEATURE, bg)
     {
         stats <- stattest(bg_filt, feature=FEATURE, covariate=COVARIATE, getFC=T)
         final <- arrange(merge(stats,details_exon, by.x=2, by.y=1, all.x=T, all.y=F),qval)
-        return(final[,c(2:9)])
+        return(final[,-1])
     }
     else if(FEATURE=="intron")
     {
         stats <- stattest(bg_filt, feature=FEATURE, meas='rcount', covariate=COVARIATE, getFC=T)
         final <- arrange(merge(stats,details_intron, by.x=2, by.y=1, all.x=T, all.y=F),qval)
-        return(final[,c(2:9)])
+        ##return(final[,c(2:9)])
+	return(final[,-1])
     }
 }
 
