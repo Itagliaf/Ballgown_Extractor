@@ -281,6 +281,19 @@ Gene_Plotter_By_Group<-function(GENE, MEAS="FPKM", GROUPVAR=NULL, BASEDIR=getwd(
         stop("Covariate variable is not defined")
     }
     
+    gene<-toupper(GENE)
+    
+    Transcripts<-bg@expr$trans
+    if(gene %in% Transcripts$gene_id | gene %in% Transcripts$gene_name)
+    {
+        id <- unique(Transcripts[which(Transcripts$gene_id==gene | Transcripts$gene_name==gene),9])
+    } 
+    else
+    { 
+        print("Invalid Gene Name inserted")
+        return("")
+    }
+    
     ##vvvv add random string from stringi package?vvvv
     file_hash<-paste(format(Sys.time(), "%d%H%M%s"))
     ##^^^^ add random string from stringi package?^^^^
@@ -292,10 +305,10 @@ Gene_Plotter_By_Group<-function(GENE, MEAS="FPKM", GROUPVAR=NULL, BASEDIR=getwd(
     png(out_file_1,width=1080,height=720)
     
     par(mar = rep(2, 4))    
-    plotMeans(gene,bg, meas=MEAS, groupvar=GROUPVAR)
+    plotMeans(id, bg, meas=MEAS, groupvar=GROUPVAR)
     
     dev.off()    
-    return(0)
+    return(out_file_1)
 }
 
 
