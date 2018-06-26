@@ -323,7 +323,7 @@ Gene_Plotter_By_Group<-function(GENE, MEAS="FPKM", GROUPVAR=NULL, BASEDIR=getwd(
     {
         OUT<-Transcripts[Transcripts$gene_name %in% id,c(1,4,5)]
     }
-    OUT<-OUT.append(out_file_2)
+    OUT<-append(OUT,out_file_2)
     names(OUT)<-append(names(OUT),"path")
     
     return(OUT)
