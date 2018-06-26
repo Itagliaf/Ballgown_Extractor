@@ -279,17 +279,18 @@ getCovariates<-function(bg)
 	return(pData(bg))
 }
 
+    
 Gene_Plotter_By_Group<-function(GENE, MEAS="FPKM", GROUPVAR=NULL, BASEDIR=getwd(), bg)
 {
     ##plots all transcripts relative to a single gene grouped by a covariate (a colname of pData(bg)).
-    
+
     if(is.null(GROUPVAR))
     {
         return("Covariate variable is not defined")
     }
-    
+
     #gene<-toupper(GENE)
-    
+
     Transcripts<-bg@expr$trans
     if(GENE %in% Transcripts$gene_id | GENE %in% Transcripts$gene_name)
     {
@@ -299,23 +300,36 @@ Gene_Plotter_By_Group<-function(GENE, MEAS="FPKM", GROUPVAR=NULL, BASEDIR=getwd(
     {
         return("Invalid Gene Name inserted")
     }
-    
+
     ##vvvv add random string from stringi package?vvvv
     file_hash<-paste(format(Sys.time(), "%d%H%M%s"))
     ##^^^^ add random string from stringi package?^^^^
-    
+
     gene<-toupper(GENE)
     out_file_1 <- paste(GENE, MEAS, GROUPVAR, file_hash,"png", sep=".")
     out_file_2 <- paste(BASEDIR,out_file_1,sep="/")
-    
+
     png(out_file_1,width=1080,height=720)
-    
-    par(mar = rep(2, 4))    
+
+    par(mar = rep(2, 4))
     plotMeans(id, bg, meas=MEAS, groupvar=GROUPVAR)
+
+    dev.off()
+    if (id %in% ranscripts$gene_id )
+    {
+	OUT<-Transcripts[Transcripts$gene_id %in% id,c(1,4,5)]
+    }
+    else
+    {
+        OUT<-Transcripts[Transcripts$gene_name %in% id,c(1,4,5)]
+    }
+    OUT<-OUT.append(out_file_2)
+    names(OUT)<-append(names(OUT),"path")
     
-    dev.off()    
-    return(out_file_1)
+    return(OUT)
 }
+  
+
 
 
 SearchTranscriptGroup<-function(NAME,MODULESFILE,bg)
