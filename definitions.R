@@ -272,26 +272,25 @@ getCovariates<-function(bg)
 	return(pData(bg))
 }
 
-Gene_Plotter_By_Group<-function(GENE, MEAS="FPKM", GROUPVAR=NULL, BASEDIR=getwd(),bg)
+Gene_Plotter_By_Group<-function(GENE, MEAS="FPKM", GROUPVAR=NULL, BASEDIR=getwd(), bg)
 {
     ##plots all transcripts relative to a single gene grouped by a covariate (a colname of pData(bg)).
     
     if(is.null(GROUPVAR))
     {
-        stop("Covariate variable is not defined")
+        return("Covariate variable is not defined")
     }
     
-    gene<-toupper(GENE)
+    #gene<-toupper(GENE)
     
     Transcripts<-bg@expr$trans
-    if(gene %in% Transcripts$gene_id | gene %in% Transcripts$gene_name)
+    if(GENE %in% Transcripts$gene_id | GENE %in% Transcripts$gene_name)
     {
-        id <- unique(Transcripts[which(Transcripts$gene_id==gene | Transcripts$gene_name==gene),9])
-    } 
+        id <- unique(Transcripts[which(Transcripts$gene_id==GENE | Transcripts$gene_name==GENE),9])
+    }
     else
-    { 
-        print("Invalid Gene Name inserted")
-        return("")
+    {
+        return("Invalid Gene Name inserted")
     }
     
     ##vvvv add random string from stringi package?vvvv
