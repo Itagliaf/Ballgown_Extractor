@@ -182,7 +182,7 @@ SearchByFeature<-function(GENE,FEATURE,bg)
 SearchByDiffFoldExpr<-function(COMBO_CONDITIONS, COVARIATE, FEATURE, bg)
 {
     ##ipotesi di due o più variabili che arrivano già in questo formato dall'utente per il subsetting (ad esempio COMBO_CONDITIONS='time_h==336 & treatment=="Irradiated"'):
-    
+    C
     bg_subset <-subset(bg,COMBO_CONDITIONS, genomesubset=FALSE)
     bg_filt<-subset(bg_subset,"rowVars(texpr(bg))>1",genomesubset=TRUE)
     
@@ -191,13 +191,13 @@ SearchByDiffFoldExpr<-function(COMBO_CONDITIONS, COVARIATE, FEATURE, bg)
 
     ## Exclude the t_name, num_exons, length in intro and exon
     details_exon <-bg_filt@expr$trans[,c(0:5,9,10)]	
-    details_intron <-bg_filt@expr$trans[,c(0:5,9,10)]
+    head(details_intron <-bg_filt@expr$trans[,c(0:5,9,10)])
 
     
     
     if(FEATURE=="transcript") 
     {
-        stats <- stattest(bg_filt, feature=FEATURE, meas='FPKM', covariate=COVARIATE, getFC=T)
+        stats <- tryCatch(stattest(bg_filt, feature=FEATURE, meas='FPKM', covariate=COVARIATE, getFC=T),error=stop("Please, control COVARIATE and COMBO_CONDITIONS. Fold changes are only available for 2-group comparisons."))
         ##adding metainfo and sorting by qvalue:
         final_stats <- arrange(merge(stats, details_trans, by.x=2, by.y=1, all.x=T, all.y=F), qval)
         
