@@ -178,24 +178,24 @@ SearchByFeature<-function(GENE,FEATURE,bg)
     return(final)
 }
 
-
 SearchByDiffFoldExpr<-function(COMBO_CONDITIONS, COVARIATE, FEATURE, bg)
 {
     ##ipotesi di due o più variabili che arrivano già in questo formato dall'utente per il subsetting (ad esempio COMBO_CONDITIONS='time_h==336 & treatment=="Irradiated"'):
     
     bg_subset <-subset(bg,COMBO_CONDITIONS, genomesubset=FALSE)
     bg_filt<-subset(bg_subset,"rowVars(texpr(bg))>1",genomesubset=TRUE)
-    
+      new_pData <- pData(bg_filt)
+
     ##Saving some metainformation:
     details_trans <-bg_filt@expr$trans[,c(0:10)]
 
     ## Exclude the t_name, num_exons, length in intro and exon
-    details_exon <-bg_filt@expr$trans[,c(0:5,9,10)]	
+    details_exon <-bg_filt@expr$trans[,c(0:5,9,10)]    
     head(details_intron <-bg_filt@expr$trans[,c(0:5,9,10)])
 
     
     
-    if(FEATURE=="transcript") 
+    if(FEATURE=="transcript")
     {
         stats <- tryCatch(stattest(bg_filt, feature=FEATURE, meas='FPKM', covariate=COVARIATE, getFC=T),
                           error=function(e) stop("Please, control COVARIATE and COMBO_CONDITIONS. Fold changes are only available for 2-group comparison"))
@@ -203,35 +203,48 @@ SearchByDiffFoldExpr<-function(COMBO_CONDITIONS, COVARIATE, FEATURE, bg)
         final_stats <- arrange(merge(stats, details_trans, by.x=2, by.y=1, all.x=T, all.y=F), qval)
         
         ##rearranging columns to show:
-        return(final_stats[,c(10,14,3:9,11,12)])
+      stats2 <- (final_stats[,c(10,14,3:9,11,12)])
+
+      newList <-     list("data.frame" = stats2, "data.frame" = new_pData)
+      return(newList)
     }
-    else if(FEATURE=="gene") 
+    else if(FEATURE=="gene")
     {    
         stats <- tryCatch(stattest(bg_filt, feature=FEATURE, meas='FPKM', covariate=COVARIATE, getFC=T),
                           error=function(e) stop("Please, control COVARIATE and COMBO_CONDITIONS. Fold changes are only available for 2-group comparisons"))
-        
-        final <- arrange(stats,qval)
-        return(final[,c(2:5)])
+      final <- arrange(stats,qval)
+      stats2 <- final[,c(2:5)]
+      newList <-     list("data.frame" = stats2, "data.frame" = new_pData)
+      
+      return(newList)
+
     }
     else if(FEATURE=="exon")
     {
-        stats <- tryCatch(stattest(bg_filt, feature=FEATURE, meas='FPKM', covariate=COVARIATE, getFC=T),
-                          error=function(e) stop("Please, control COVARIATE and COMBO_CONDITIONS. Fold changes are only available for 2-group comparisons"))
+        stats <- tryCatch(stattest(bg_filt, feature=FEATURE, meas='cov', covariate=COVARIATE, getFC=T),
+                          error=function(e) stop("Error, exons do not have FPKM measurements. Please, set meas = 'cov' "))
 
         final <- arrange(merge(stats,details_exon, by.x=2, by.y=1, all.x=T, all.y=F),qval)
-        return(final[,-1])
+        stats2 <- final[,-1]
+        newList <- list("data.frame" = stats2, "data.frame" = new_pData)
+
+        return(newList) 
     }
     else if(FEATURE=="intron")
     {
-        stats <- tryCatch(stattest(bg_filt, feature=FEATURE, meas='FPKM', covariate=COVARIATE, getFC=T),
-                          error=function(e) stop("Please, control COVARIATE and COMBO_CONDITIONS. Fold changes are only available for 2-group comparisons"))
+        stats <- tryCatch(stattest(bg_filt, feature=FEATURE, meas='cov', covariate=COVARIATE, getFC=T),
+                          error=function(e) stop("Error, introns do not have FPKM measurements. Please, set meas = 'cov' "))
 
 
         final <- arrange(merge(stats,details_intron, by.x=2, by.y=1, all.x=T, all.y=F),qval)
-        ##return(final[,c(2:9)])
-	return(final[,-1])
+        stats2 <- final[,-1]
+        newList <-list("data.frame" = stats2, "data.frame" = new_pData)
+
+        return(newList)
+
     }
 }
+
 
 StatsFiltering<-function(STATS, Q_THRESHOLD=0.05, P_THRESHOLD=0.05, MIN_FOLD_CHANGE=2)
 {
