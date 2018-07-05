@@ -59,15 +59,15 @@ SearchByCondition<-function(COMBO_CONDITIONS, GENE=NULL, bg)
 }
 
 SearchByGene<-function(GENE,bg)
-    ##subsets the dataframe to extract only lines with a certain gene_name (gene symbol) or gene_id
+    ##subsets the dataframe to extract only lines with a certain list of gene_names (gene symbols) or gene_ids. It works with single genes as well.
     
 {
     print(paste("Search By Gene", GENE))
     Transcripts<-bg@expr$trans
     if(GENE %in% Transcripts$gene_id | GENE %in% Transcripts$gene_name)
     {
-        id <- unique(Transcripts[which(Transcripts$gene_id==GENE | Transcripts$gene_name==GENE),9])
-        
+        id <- unique(Transcripts[which(GENE %in% Transcripts$gene_id | GENE %in% Transcripts$gene_name),9])
+ 
         ##vvvv NOT actually needed for genes but its necessary for lowercase
         ##Name<-toupper(Name)
         ##Gene<-tolower(GENE)
@@ -264,9 +264,9 @@ StatsFiltering<-function(STATS, Q_THRESHOLD=0.05, P_THRESHOLD=0.05, MIN_FOLD_CHA
     print(combination_filters_string)
     
     ##filter and show the data frame with the specified thresholds of interest:                                                                           
-    filt_stats_table <- stats_without_na[(stats_without_na$pval< P_THRESHOLD & stats_without_na$qval< Q_THRESHOLD & (stats_without_na$fc > log2(MIN_FOLD_CHANGE +1) | stats_without_na$fc <log2(1/MIN_FOLD_CHANGE)+1)) ,]
-    
-    return(filt_stats_table)
+    filt_stats_table <- stats_without_na[(stats_without_na$pval< P_THRESHOLD | stats_without_na$qval< Q_THRESHOLD & (stats_without_na$fc > log2(MIN_FOLD_CHANGE +1) | stats_without_na$fc <log2(1/MIN_FOLD_CHANGE)+1)) ,]
+    newList <- list("p.val.pass"=p.val_filtering, "q.val.pass"=q.val_filtering, "fc.pass"=fc_filtering, "filt_stats"= filt_stats_table)
+    return(newList)
 }
 
 getGenes<-function(bg)
