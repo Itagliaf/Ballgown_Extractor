@@ -204,8 +204,7 @@ SearchByDiffFoldExpr<-function(COMBO_CONDITIONS, COVARIATE, FEATURE, bg)
         
         ##rearranging columns to show:
       stats2 <- (final_stats[,c(10,14,3:9,11,12)])
-
-      newList <-     list("data.frame" = stats2, "data.frame" = new_pData)
+      newList <- list("table" = stats2, "phenodata" = new_pData)
       return(newList)
     }
     else if(FEATURE=="gene")
@@ -214,8 +213,7 @@ SearchByDiffFoldExpr<-function(COMBO_CONDITIONS, COVARIATE, FEATURE, bg)
                           error=function(e) stop("Please, control COVARIATE and COMBO_CONDITIONS. Fold changes are only available for 2-group comparisons"))
       final <- arrange(stats,qval)
       stats2 <- final[,c(2:5)]
-      newList <-     list("data.frame" = stats2, "data.frame" = new_pData)
-      
+      newList <- list("table" = stats2, "phenodata" = new_pData)
       return(newList)
 
     }
@@ -226,8 +224,7 @@ SearchByDiffFoldExpr<-function(COMBO_CONDITIONS, COVARIATE, FEATURE, bg)
 
         final <- arrange(merge(stats,details_exon, by.x=2, by.y=1, all.x=T, all.y=F),qval)
         stats2 <- final[,-1]
-        newList <- list("data.frame" = stats2, "data.frame" = new_pData)
-
+        newList <- list("table" = stats2, "phenodata" = new_pData)
         return(newList) 
     }
     else if(FEATURE=="intron")
@@ -238,8 +235,7 @@ SearchByDiffFoldExpr<-function(COMBO_CONDITIONS, COVARIATE, FEATURE, bg)
 
         final <- arrange(merge(stats,details_intron, by.x=2, by.y=1, all.x=T, all.y=F),qval)
         stats2 <- final[,-1]
-        newList <-list("data.frame" = stats2, "data.frame" = new_pData)
-
+        newList <-list("table" = stats2, "phenodata" = new_pData)
         return(newList)
 
     }
