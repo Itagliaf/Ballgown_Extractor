@@ -460,4 +460,13 @@ Network<-function(QUERY,MODULES,bg,CORR=0.9,RESULTS=50,BASEDIR=getwd())
     return(graph)
 }
 
+GetNew_pData<-function(COMBO_CONDITIONS, bg)
+{
+ ##This function results in the new phenodata configuration, after subsetting a dataset for a (set of) condition(s).
+        
+      bg_subset <- subset(bg, COMBO_CONDITIONS, genomesubset=FALSE)
+      new_pData <- pData(bg_filt)
+      return(new_pData)
+}
+
 
