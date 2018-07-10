@@ -38,7 +38,7 @@ SearchByCondition<-function(COMBO_CONDITIONS, GENE=NULL, bg)
     bg_subset <-subset(bg, COMBO_CONDITIONS, genomesubset=FALSE)
     
     Transcripts<-bg_subset@expr$trans
-    GENE<-toupper(GENE)
+    #GENE<-toupper(GENE)
     
     if (!is.null(GENE))
     {
