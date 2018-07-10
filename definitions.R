@@ -64,21 +64,20 @@ SearchByGene<-function(GENE,bg)
 {
     print(paste("Search By Gene", GENE))
     Transcripts<-bg@expr$trans
-    if(GENE %in% Transcripts$gene_id | GENE %in% Transcripts$gene_name)
+    if(GENE %in% Transcripts$gene_id || GENE %in% Transcripts$gene_name)
     {
-        id <- unique(Transcripts[which(GENE %in% Transcripts$gene_id | GENE %in% Transcripts$gene_name),9])
+        id <- unique(Transcripts[which(Transcripts$gene_id %in% GENE | Transcripts$gene_name %in% GENE),9])
  
-        ##vvvv NOT actually needed for genes but its necessary for lowercase
+        ##vvvv NOT actually needed for genes but it's necessary for lowercase
         ##Name<-toupper(Name)
         ##Gene<-tolower(GENE)
         final <- gexpr(bg)[id, ]
-        return(final)
     } 
     else 
     { 
-        print("Invalid Gene Name inserted")
+        final <- ("Invalid Gene Name inserted")
     }
-    
+    return(final)
 }
 
 SearchByTranscript<-function(TRANSCRIPT_ID, bg)
