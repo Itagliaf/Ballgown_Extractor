@@ -183,7 +183,7 @@ SearchByDiffFoldExpr<-function(COMBO_CONDITIONS, COVARIATE, FEATURE, bg)
     
     bg_subset <-subset(bg,COMBO_CONDITIONS, genomesubset=FALSE)
     bg_filt<-subset(bg_subset,"rowVars(texpr(bg))>1",genomesubset=TRUE)
-      new_pData <- pData(bg_filt)
+    new_pData <- pData(bg_filt)
 
     ##Saving some metainformation:
     details_trans <-bg_filt@expr$trans[,c(0:10)]
