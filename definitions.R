@@ -198,7 +198,9 @@ SearchByDiffFoldExpr<-function(COMBO_CONDITIONS, COVARIATE, FEATURE, bg)
     {
         stats <- tryCatch(stattest(bg_filt, feature=FEATURE, meas='FPKM', covariate=COVARIATE, getFC=T),
                           error=function(e) stop("Please, control COVARIATE and COMBO_CONDITIONS. Fold changes are only available for 2-group comparison"))
-        ##adding metainfo and sorting by qvalue:
+        fc_t <- ifelse(stats$fc < 1 , -1/stats$fc, stats$fc)
+        stats[,3] <- fc_t
+	##adding metainfo and sorting by qvalue:
         final_stats <- arrange(merge(stats, details_trans, by.x=2, by.y=1, all.x=T, all.y=F), qval)
         
         ##rearranging columns to show:
@@ -211,7 +213,10 @@ SearchByDiffFoldExpr<-function(COMBO_CONDITIONS, COVARIATE, FEATURE, bg)
         stats <- tryCatch(stattest(bg_filt, feature=FEATURE, meas='FPKM', covariate=COVARIATE, getFC=T),
                           error=function(e) stop("Please, control COVARIATE and COMBO_CONDITIONS. Fold changes are only available for 2-group comparisons"))
       final <- arrange(stats,qval)
-      stats2 <- final[,c(2:5)]
+			  #Since all the values for fold changes are greater than 0, we make a transformation in order to better appreciate the down-regulated genes.
+      fc_t <- ifelse(final$fc < 1 , -1/final$fc, final$fc)
+      final[,3] <- fc_t
+      stats2 <- final[, c(2:5)]
       newList <- list("table" = stats2, "phenodata" = new_pData)
       return(newList)
 
@@ -222,7 +227,9 @@ SearchByDiffFoldExpr<-function(COMBO_CONDITIONS, COVARIATE, FEATURE, bg)
                           error=function(e) stop("Error, exons do not have FPKM measurements. Please, set meas = 'cov' "))
 
         final <- arrange(merge(stats,details_exon, by.x=2, by.y=1, all.x=T, all.y=F),qval)
-        stats2 <- final[,-1]
+        fc_t <- ifelse(final$fc < 1 , -1/final$fc, final$fc)
+        final[,3] <- fc_t
+	stats2 <- final[,-1]
         newList <- list("table" = stats2, "phenodata" = new_pData)
         return(newList) 
     }
@@ -233,7 +240,9 @@ SearchByDiffFoldExpr<-function(COMBO_CONDITIONS, COVARIATE, FEATURE, bg)
 
 
         final <- arrange(merge(stats,details_intron, by.x=2, by.y=1, all.x=T, all.y=F),qval)
-        stats2 <- final[,-1]
+        fc_t <- ifelse(final$fc < 1 , -1/final$fc, final$fc)
+        final[,3] <- fc_t
+	stats2 <- final[,-1]
         newList <-list("table" = stats2, "phenodata" = new_pData)
         return(newList)
 
