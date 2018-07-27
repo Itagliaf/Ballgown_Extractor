@@ -258,21 +258,24 @@ StatsFiltering<-function(STATS, Q_THRESHOLD=0.05, P_THRESHOLD=0.05, MIN_FOLD_CHA
     ##Print some summary stats:                                                                                                                           
     p.val_filtering <- sum(stats_without_na$pval< P_THRESHOLD)
     q.val_filtering <- sum(stats_without_na$qval< Q_THRESHOLD)
-    fc_filtering <- sum(stats_without_na$fc> log2(MIN_FOLD_CHANGE + 1) | stats_without_na$fc< log2((1/MIN_FOLD_CHANGE)+1))
-    combination_of_filters <- sum(stats_without_na$pval< P_THRESHOLD & stats_without_na$qval< Q_THRESHOLD & stats_without_na$fc> log2(MIN_FOLD_CHANGE + 1) | stats_without_na$fc< log2((1/MIN_FOLD_CHANGE)+1))
+    fc_filtering <- sum(abs(stats_without_na$fc)> MIN_FOLD_CHANGE)
+    combination_of_p_and_FC <- sum(stats_without_na$pval< P_THRESHOLD & (abs(stats_without_na$fc)> MIN_FOLD_CHANGE))
+    combination_of_q_and_FC <- sum(stats_without_na$qval< Q_THRESHOLD & (abs(stats_without_na$fc)> MIN_FOLD_CHANGE))
     
     pval_string<-paste("There are",p.val_filtering,"entries satisfying the desired p-value threshold",sep=" " )
     qval_string<-paste("There are",q.val_filtering,"entries satisfying the desired q-value threshold",sep=" " )
     fc_string<-paste("There are",fc_filtering,"entries satisfying the desired fold change threshold",sep=" " )
-    combination_filters_string<-paste("There are", combination_of_filters, "entries satisfying the desired combination of fold change, p-value and q-value thresholds",sep=" " )
+    combination_filters_1<-paste("There are", combination_of_p_and_FC, "entries satisfying the desired combination of fold change and p-value thresholds",sep=" " )
+    combination_filters_2<-paste("There are", combination_of_q_and_FC, "entries satisfying the desired combination of fold change and q-value thresholds",sep=" " )
     
     print(pval_string)
     print(qval_string)
     print(fc_string)
-    print(combination_filters_string)
-    
+    print(combination_filters_1)
+    print(combination_filters_2)
+	
     ##filter and show the data frame with the specified thresholds of interest:                                                                           
-    filt_stats_table <- stats_without_na[(stats_without_na$pval< P_THRESHOLD | stats_without_na$qval< Q_THRESHOLD & (stats_without_na$fc > log2(MIN_FOLD_CHANGE +1) | stats_without_na$fc <log2(1/MIN_FOLD_CHANGE)+1)) ,]
+    filt_stats_table <- stats_without_na[(stats_without_na$pval< P_THRESHOLD | stats_without_na$qval< Q_THRESHOLD) & abs(stats_without_na$fc)> MIN_FOLD_CHANGE ,]
     newList <- list("p.val.pass"=p.val_filtering, "q.val.pass"=q.val_filtering, "fc.pass"=fc_filtering, "filt_stats"= filt_stats_table)
     return(newList)
 }
